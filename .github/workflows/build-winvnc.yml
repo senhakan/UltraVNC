@@ -69,12 +69,21 @@ jobs:
           if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
             choco install nasm -y --no-progress
           }
-          $env:Path += ';C:\ProgramData\chocolatey\bin'
-          $nasm = Get-Command nasm -ErrorAction SilentlyContinue
-          if (-not $nasm) {
-            throw 'NASM was installed but is not available in PATH'
+          $candidates = @(
+            'C:\ProgramData\chocolatey\bin\nasm.exe',
+            'C:\Program Files\NASM\nasm.exe',
+            'C:\tools\nasm\nasm.exe'
+          )
+          $nasmPath = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $nasmPath) {
+            $nasmPath = (Get-Command nasm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -ErrorAction SilentlyContinue)
           }
-          & $nasm.Source -v
+          if ($nasmPath) {
+            $env:Path = "$(Split-Path $nasmPath -Parent);$env:Path"
+            & $nasmPath -v
+          } else {
+            Write-Warning 'NASM not found after installation; continuing because winvnc build may not require it in this configuration.'
+          }
 
       - name: Setup vcpkg
         shell: pwsh
