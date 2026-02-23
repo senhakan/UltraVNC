@@ -206,6 +206,10 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+!/.github/
+!/.github/workflows/
+!/.github/workflows/*.yml
+!/.github/workflows/*.yaml
 *.qm
 *.prl
 
