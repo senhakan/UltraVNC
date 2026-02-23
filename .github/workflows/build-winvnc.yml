@@ -49,8 +49,7 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 120
     env:
-      SOLUTION_PATH: winvnc/winvnc.sln
-      PROJECT_NAME: winvnc
+      BUILD_PATH: winvnc/winvnc/winvnc.vcxproj
       VCPKG_ROOT: C:\\vcpkg
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\\vcpkg_cache
       CONFIGURATION: ${{ inputs.configuration || 'Release' }}
@@ -125,8 +124,8 @@ jobs:
       - name: Build winvnc.exe
         shell: pwsh
         run: |
-          msbuild "$env:SOLUTION_PATH" `
-            /t:$env:PROJECT_NAME `
+          msbuild "$env:BUILD_PATH" `
+            /t:Build `
             /m `
             /p:Configuration=$env:CONFIGURATION `
             /p:Platform=$env:PLATFORM `
