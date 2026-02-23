@@ -69,7 +69,12 @@ jobs:
           if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
             choco install nasm -y --no-progress
           }
-          nasm -v
+          $env:Path += ';C:\ProgramData\chocolatey\bin'
+          $nasm = Get-Command nasm -ErrorAction SilentlyContinue
+          if (-not $nasm) {
+            throw 'NASM was installed but is not available in PATH'
+          }
+          & $nasm.Source -v
 
       - name: Setup vcpkg
         shell: pwsh
