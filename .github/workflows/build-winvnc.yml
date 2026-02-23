@@ -136,6 +136,7 @@ jobs:
             /m `
             /p:Configuration=$env:CONFIGURATION `
             /p:Platform=$env:PLATFORM `
+            /p:IncludePath="$(VC_AtlmfcIncludePath);$(IncludePath)" `
             /p:VcpkgEnableManifest=false `
             /p:PostBuildEventUseInBuild=false
 
