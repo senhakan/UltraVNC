@@ -148,6 +148,7 @@ jobs:
       - name: Build winvnc.exe
         shell: pwsh
         run: |
+          $legacyOutDir = "..\\$env:PLATFORM\\$env:CONFIGURATION\\"
           msbuild "$env:BUILD_PATH" `
             /t:Build `
             /m `
@@ -155,20 +156,27 @@ jobs:
             /p:Platform=$env:PLATFORM `
             /p:PlatformToolset=v143 `
             /p:UseOfAtl=Static `
+            /p:OutDir="$legacyOutDir" `
+            /p:IntDir="$legacyOutDir" `
             /p:VcpkgEnableManifest=false `
             /p:PostBuildEventUseInBuild=false
 
       - name: Validate build output (smoke test)
         shell: pwsh
         run: |
+          $candidates = @()
           if ($env:PLATFORM -eq 'x64') {
-            $exe = Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\x64\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\x64\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\x64\\$env:CONFIGURATION\\winvnc.exe"
           } else {
-            $exe = Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\$env:CONFIGURATION\\winvnc.exe"
           }
 
-          if (-not (Test-Path $exe)) {
-            throw "winvnc.exe not found at expected path: $exe"
+          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if (-not $exe) {
+            throw "winvnc.exe not found in expected paths: $($candidates -join ', ')"
           }
 
           $item = Get-Item $exe
@@ -191,5 +199,7 @@ jobs:
           name: winvnc-${{ env.PLATFORM }}-${{ env.CONFIGURATION }}
           if-no-files-found: error
           path: |
+            winvnc/x64/${{ env.CONFIGURATION }}/winvnc.exe
+            winvnc/${{ env.CONFIGURATION }}/winvnc.exe
             winvnc/winvnc/x64/${{ env.CONFIGURATION }}/winvnc.exe
             winvnc/winvnc/${{ env.CONFIGURATION }}/winvnc.exe
