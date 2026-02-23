@@ -151,7 +151,7 @@ jobs:
           $legacyOutDir = "..\\$env:PLATFORM\\$env:CONFIGURATION\\"
           msbuild "$env:BUILD_PATH" `
             /t:Build `
-            /m `
+            /m:1 `
             /p:Configuration=$env:CONFIGURATION `
             /p:Platform=$env:PLATFORM `
             /p:PlatformToolset=v143 `
