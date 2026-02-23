@@ -128,6 +128,23 @@ jobs:
             "liblzma:$triplet" `
             "libsodium:$triplet"
 
+      - name: Diagnose ATL include availability
+        shell: pwsh
+        run: |
+          $atlHeader = Get-ChildItem `
+            -Path "${env:ProgramFiles(x86)}\\Microsoft Visual Studio\\2022" `
+            -Filter atlbase.h `
+            -Recurse `
+            -ErrorAction SilentlyContinue |
+            Select-Object -First 5 -ExpandProperty FullName
+
+          if ($atlHeader) {
+            Write-Host "Found atlbase.h:"
+            $atlHeader | ForEach-Object { Write-Host "  $_" }
+          } else {
+            Write-Warning "atlbase.h was not found under VS2022 directories."
+          }
+
       - name: Build winvnc.exe
         shell: pwsh
         run: |
@@ -136,7 +153,8 @@ jobs:
             /m `
             /p:Configuration=$env:CONFIGURATION `
             /p:Platform=$env:PLATFORM `
-            /p:IncludePath="`$(VC_AtlmfcIncludePath)%3B`$(IncludePath)" `
+            /p:PlatformToolset=v143 `
+            /p:UseOfAtl=Static `
             /p:VcpkgEnableManifest=false `
             /p:PostBuildEventUseInBuild=false
 
