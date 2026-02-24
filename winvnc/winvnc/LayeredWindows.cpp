@@ -274,9 +274,7 @@ LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wPar
         if (set_OSD) {
             RECT rc;
             GetClientRect(hwnd, &rc);
-            rc.left += 10;
-            rc.top += 10;
-            DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_LEFT);
+            DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_CENTER | DT_VCENTER | DT_WORDBREAK);
         }
 
         SelectObject(hdc, original);
