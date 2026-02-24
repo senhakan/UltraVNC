@@ -45,6 +45,8 @@ SettingsManager::SettingsManager()
 	m_runtimeEnableNotification = false;
 	m_runtimeHideTrayIcon = false;
 	m_runtimeConnectionOverlay = false;
+	memset(m_runtimeOverlayUser, 0, sizeof(m_runtimeOverlayUser));
+	memset(m_runtimeOverlayMessage, 0, sizeof(m_runtimeOverlayMessage));
 	setDefaults();
 }
 
@@ -379,6 +381,21 @@ void SettingsManager::setRuntimeConnectionOverlay()
 {
 	m_runtimeConnectionOverlay = true;
 	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeOverlayUser(const char* user)
+{
+	memset(m_runtimeOverlayUser, 0, sizeof(m_runtimeOverlayUser));
+	memset(m_runtimeOverlayMessage, 0, sizeof(m_runtimeOverlayMessage));
+
+	if (user) {
+		strncpy_s(m_runtimeOverlayUser, sizeof(m_runtimeOverlayUser), user, _TRUNCATE);
+	}
+
+	if (strlen(m_runtimeOverlayUser) > 0) {
+		_snprintf_s(m_runtimeOverlayMessage, sizeof(m_runtimeOverlayMessage), _TRUNCATE,
+			"Uzaktan destek aktif! Bagli kullanici: %s", m_runtimeOverlayUser);
+	}
 }
 
 void SettingsManager::load()

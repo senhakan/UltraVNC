@@ -25,6 +25,7 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "LayeredWindows.h"
+#include "SettingsManager.h"
 
 HWND LayeredWindows::hwnd;
 HINSTANCE LayeredWindows::hInst;
@@ -442,6 +443,12 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
 void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD)
 {
     const char* overlayText = infoMsg;
+    if ((overlayText == NULL || strlen(overlayText) == 0) && settings) {
+        const char* runtimeOverlay = settings->getRuntimeOverlayMessage();
+        if (runtimeOverlay && strlen(runtimeOverlay) > 0) {
+            overlayText = runtimeOverlay;
+        }
+    }
     if (overlayText == NULL || strlen(overlayText) == 0) {
         overlayText = "OpView session is active on this device";
     }

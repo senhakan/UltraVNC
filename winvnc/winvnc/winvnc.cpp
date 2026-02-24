@@ -342,13 +342,14 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 	const size_t notificationLen = strlen(winvncEnableNotification);
 	const size_t hideTrayLen = strlen(winvncHideTrayIcon);
 	const size_t connectionOverlayLen = strlen(winvncConnectionOverlay);
+	const size_t overlayUserLen = strlen(winvncOverlayUser);
 	for (size_t i = 0; i < n; ++i)
 	{
 		if (cmdline[i] <= ' ')
 			continue;
 
 		if (i + displayModeLen <= n &&
-			strncmp(&cmdline[i], winvncDisplayMode, displayModeLen) == 0 &&
+			_strnicmp(&cmdline[i], winvncDisplayMode, displayModeLen) == 0 &&
 			isArgBoundary(cmdline[i + displayModeLen]))
 		{
 			i += displayModeLen;
@@ -357,10 +358,10 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 			while (cmdline[i] > ' ') i++;
 			size_t len = i - start;
 
-			if (len == 9 && strncmp(&cmdline[start], "secondary", 9) == 0) {
+			if (len == 9 && _strnicmp(&cmdline[start], "secondary", 9) == 0) {
 				settings->setRuntimeDisplayModeSecondary();
 			}
-			else if (len == 3 && strncmp(&cmdline[start], "all", 3) == 0) {
+			else if (len == 3 && _strnicmp(&cmdline[start], "all", 3) == 0) {
 				settings->setRuntimeDisplayModeAll();
 			}
 			else {
@@ -370,7 +371,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 		}
 
 		if (i + portOverrideLen <= n &&
-			strncmp(&cmdline[i], winvncPortOverride, portOverrideLen) == 0 &&
+			_strnicmp(&cmdline[i], winvncPortOverride, portOverrideLen) == 0 &&
 			isArgBoundary(cmdline[i + portOverrideLen]))
 		{
 			i += portOverrideLen;
@@ -388,7 +389,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 		}
 
 		if (i + notificationLen <= n &&
-			strncmp(&cmdline[i], winvncEnableNotification, notificationLen) == 0 &&
+			_strnicmp(&cmdline[i], winvncEnableNotification, notificationLen) == 0 &&
 			isArgBoundary(cmdline[i + notificationLen]))
 		{
 			settings->setRuntimeEnableNotification();
@@ -397,7 +398,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 		}
 
 		if (i + hideTrayLen <= n &&
-			strncmp(&cmdline[i], winvncHideTrayIcon, hideTrayLen) == 0 &&
+			_strnicmp(&cmdline[i], winvncHideTrayIcon, hideTrayLen) == 0 &&
 			isArgBoundary(cmdline[i + hideTrayLen]))
 		{
 			settings->setRuntimeHideTrayIcon();
@@ -406,11 +407,42 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 		}
 
 		if (i + connectionOverlayLen <= n &&
-			strncmp(&cmdline[i], winvncConnectionOverlay, connectionOverlayLen) == 0 &&
+			_strnicmp(&cmdline[i], winvncConnectionOverlay, connectionOverlayLen) == 0 &&
 			isArgBoundary(cmdline[i + connectionOverlayLen]))
 		{
 			settings->setRuntimeConnectionOverlay();
 			i += connectionOverlayLen;
+			continue;
+		}
+
+		if (i + overlayUserLen <= n &&
+			_strnicmp(&cmdline[i], winvncOverlayUser, overlayUserLen) == 0 &&
+			isArgBoundary(cmdline[i + overlayUserLen]))
+		{
+			i += overlayUserLen;
+			while (cmdline[i] <= ' ' && cmdline[i] != 0) i++;
+
+			char userBuf[128] = { 0 };
+			if (cmdline[i] == '\"') {
+				++i;
+				size_t start = i;
+				while (cmdline[i] != 0 && cmdline[i] != '\"') i++;
+				size_t len = i - start;
+				if (len > 0) {
+					strncpy_s(userBuf, sizeof(userBuf), &cmdline[start], len);
+				}
+			}
+			else {
+				size_t start = i;
+				while (cmdline[i] > ' ') i++;
+				size_t len = i - start;
+				if (len > 0) {
+					strncpy_s(userBuf, sizeof(userBuf), &cmdline[start], len);
+				}
+			}
+			if (strlen(userBuf) > 0) {
+				settings->setRuntimeOverlayUser(userBuf);
+			}
 			continue;
 		}
 	}
