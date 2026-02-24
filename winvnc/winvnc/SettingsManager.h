@@ -269,6 +269,8 @@ public:
 	void setRuntimeEnableNotification();
 	void setRuntimeHideTrayIcon();
 	void setRuntimeConnectionOverlay();
+	void setRuntimeOverlayUser(const char* user);
+	const char* getRuntimeOverlayMessage() { return m_runtimeOverlayMessage; };
 
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
@@ -311,6 +313,8 @@ private:
 	bool m_runtimeEnableNotification;
 	bool m_runtimeHideTrayIcon;
 	bool m_runtimeConnectionOverlay;
+	char m_runtimeOverlayUser[128];
+	char m_runtimeOverlayMessage[256];
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
