@@ -58,6 +58,7 @@ SettingsManager::SettingsManager()
 	m_runtimePortOverride = 0;
 	m_runtimeEnableNotification = false;
 	m_runtimeHideTrayIcon = false;
+	m_runtimeConnectionOverlay = false;
 	setDefaults();
 }
 
@@ -344,6 +345,11 @@ void SettingsManager::applyRuntimeOverrides()
 	if (m_runtimeHideTrayIcon) {
 		m_pref_DisableTrayIcon = TRUE;
 	}
+
+	if (m_runtimeConnectionOverlay) {
+		m_pref_Frame = TRUE;
+		m_pref_OSD = TRUE;
+	}
 }
 
 void SettingsManager::setRuntimeDisplayModePrimary()
@@ -380,6 +386,12 @@ void SettingsManager::setRuntimeEnableNotification()
 void SettingsManager::setRuntimeHideTrayIcon()
 {
 	m_runtimeHideTrayIcon = true;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeConnectionOverlay()
+{
+	m_runtimeConnectionOverlay = true;
 	applyRuntimeOverrides();
 }
 
