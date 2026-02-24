@@ -39,6 +39,11 @@ SettingsManager* SettingsManager::getInstance()
 SettingsManager::SettingsManager()
 {
 	sodium_init();
+	m_runtimeDisplayMode = RUNTIME_DISPLAYMODE_NONE;
+	m_runtimePortOverrideEnabled = false;
+	m_runtimePortOverride = 0;
+	m_runtimeEnableNotification = false;
+	m_runtimeHideTrayIcon = false;
 	setDefaults();
 }
 
@@ -289,8 +294,80 @@ void SettingsManager::setDefaults()
 	strcpy_s(m_pref_authhosts, "");
 	loadPasswordFromHex(m_pref_passwd, sizeof(m_pref_passwd), "9B436DCF28FDBD8783");
 	loadPasswordFromHex(m_pref_passwdViewOnly, sizeof(m_pref_passwdViewOnly), "C80765925ABEBE2AC6");
+	applyRuntimeOverrides();
 
 };
+
+void SettingsManager::applyRuntimeOverrides()
+{
+	switch (m_runtimeDisplayMode) {
+	case RUNTIME_DISPLAYMODE_PRIMARY:
+		m_pref_Primary = TRUE;
+		m_pref_Secondary = FALSE;
+		break;
+	case RUNTIME_DISPLAYMODE_SECONDARY:
+		m_pref_Primary = FALSE;
+		m_pref_Secondary = TRUE;
+		break;
+	case RUNTIME_DISPLAYMODE_ALL:
+		m_pref_Primary = TRUE;
+		m_pref_Secondary = TRUE;
+		break;
+	default:
+		break;
+	}
+
+	if (m_runtimePortOverrideEnabled && m_runtimePortOverride > 0 && m_runtimePortOverride <= 65535) {
+		m_pref_AutoPortSelect = FALSE;
+		m_pref_PortNumber = m_runtimePortOverride;
+		m_pref_HttpPortNumber = DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber));
+	}
+
+	if (m_runtimeEnableNotification) {
+		m_pref_Notification = TRUE;
+	}
+
+	if (m_runtimeHideTrayIcon) {
+		m_pref_DisableTrayIcon = TRUE;
+	}
+}
+
+void SettingsManager::setRuntimeDisplayModePrimary()
+{
+	m_runtimeDisplayMode = RUNTIME_DISPLAYMODE_PRIMARY;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeDisplayModeSecondary()
+{
+	m_runtimeDisplayMode = RUNTIME_DISPLAYMODE_SECONDARY;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeDisplayModeAll()
+{
+	m_runtimeDisplayMode = RUNTIME_DISPLAYMODE_ALL;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimePortOverride(LONG port)
+{
+	m_runtimePortOverrideEnabled = (port > 0 && port <= 65535);
+	m_runtimePortOverride = port;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeEnableNotification()
+{
+	m_runtimeEnableNotification = true;
+	applyRuntimeOverrides();
+}
+
+void SettingsManager::setRuntimeHideTrayIcon()
+{
+	m_runtimeHideTrayIcon = true;
+	applyRuntimeOverrides();
+}
 
 void SettingsManager::load()
 {

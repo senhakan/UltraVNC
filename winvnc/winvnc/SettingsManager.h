@@ -248,6 +248,12 @@ public:
 	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
 
+	void setRuntimeDisplayModePrimary();
+	void setRuntimeDisplayModeSecondary();
+	void setRuntimeDisplayModeAll();
+	void setRuntimePortOverride(LONG port);
+	void setRuntimeEnableNotification();
+	void setRuntimeHideTrayIcon();
 
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
@@ -273,8 +279,22 @@ private:
 	SettingsManager();
 	static SettingsManager* s_instance;
 	void setDefaults();
+	void applyRuntimeOverrides();
 	void initTemp();
 	IniFile iniFile;
+
+	enum RuntimeDisplayMode {
+		RUNTIME_DISPLAYMODE_NONE = 0,
+		RUNTIME_DISPLAYMODE_PRIMARY,
+		RUNTIME_DISPLAYMODE_SECONDARY,
+		RUNTIME_DISPLAYMODE_ALL
+	};
+
+	RuntimeDisplayMode m_runtimeDisplayMode;
+	bool m_runtimePortOverrideEnabled;
+	LONG m_runtimePortOverride;
+	bool m_runtimeEnableNotification;
+	bool m_runtimeHideTrayIcon;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
