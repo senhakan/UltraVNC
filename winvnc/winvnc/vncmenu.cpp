@@ -258,18 +258,10 @@ vncMenu::vncMenu(vncServer* server)
 //	m_winvnc_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC));
 //	m_flash_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_FLASH));
 	{
-		m_winvnc_icon = (HICON)LoadImage(NULL, "icon1.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-			GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE | LR_DEFAULTCOLOR);
-		m_flash_icon = (HICON)LoadImage(NULL, "icon2.ico", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
-			GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE | LR_DEFAULTCOLOR);
-		// [v1.0.2-jp1 fix]
-		//if (!m_winvnc_icon) m_winvnc_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
-		if (!m_winvnc_icon) m_winvnc_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
+		m_winvnc_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_WINVNC), IMAGE_ICON,
 			GetSystemMetrics(SM_CXSMICON),
 			GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-		// [v1.0.2-jp1 fix]
-		//if (!m_flash_icon) m_flash_icon=(HICON)LoadImage(hAppInstance, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
-		if (!m_flash_icon) m_flash_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
+		m_flash_icon = (HICON)LoadImage(hInstResDLL, MAKEINTRESOURCE(IDI_FLASH), IMAGE_ICON,
 			GetSystemMetrics(SM_CXSMICON),
 			GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 	}
