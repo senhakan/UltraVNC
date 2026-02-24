@@ -190,8 +190,8 @@ void SettingsManager::setDefaults()
 	m_pref_LockSettings = 0;
 	m_pref_Collabo = false;
 #ifndef SC_20
-	m_pref_Frame = FALSE;
-	m_pref_Notification = FALSE;
+	m_pref_Frame = TRUE;
+	m_pref_Notification = TRUE;
 #else
 	m_pref_Frame = true;
 	m_pref_Notification = true;
