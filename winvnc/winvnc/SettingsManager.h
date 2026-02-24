@@ -1,26 +1,12 @@
-/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
 //
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
 //
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-//  If the source code for the program is not available from the place from
-//  which you received this file, check
-//  https://uvnc.com/
-//
-////////////////////////////////////////////////////////////////////////////
 
 
 #pragma once
@@ -262,6 +248,12 @@ public:
 	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
 
+	void setRuntimeDisplayModePrimary();
+	void setRuntimeDisplayModeSecondary();
+	void setRuntimeDisplayModeAll();
+	void setRuntimePortOverride(LONG port);
+	void setRuntimeEnableNotification();
+	void setRuntimeHideTrayIcon();
 
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
@@ -288,9 +280,23 @@ private:
 	static SettingsManager* s_instance;
 	void setDefaults();
 	void applyEmbeddedProfile();
+	void applyRuntimeOverrides();
 	void initTemp();
 	IniFile iniFile;
 	bool m_embeddedProfile;
+
+	enum RuntimeDisplayMode {
+		RUNTIME_DISPLAYMODE_NONE = 0,
+		RUNTIME_DISPLAYMODE_PRIMARY,
+		RUNTIME_DISPLAYMODE_SECONDARY,
+		RUNTIME_DISPLAYMODE_ALL
+	};
+
+	RuntimeDisplayMode m_runtimeDisplayMode;
+	bool m_runtimePortOverrideEnabled;
+	LONG m_runtimePortOverride;
+	bool m_runtimeEnableNotification;
+	bool m_runtimeHideTrayIcon;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;

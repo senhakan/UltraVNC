@@ -371,16 +371,13 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 			size_t len = i - start;
 
 			if (len == 9 && strncmp(&cmdline[start], "secondary", 9) == 0) {
-				settings->setPrimary(FALSE);
-				settings->setSecondary(TRUE);
+				settings->setRuntimeDisplayModeSecondary();
 			}
 			else if (len == 3 && strncmp(&cmdline[start], "all", 3) == 0) {
-				settings->setPrimary(TRUE);
-				settings->setSecondary(TRUE);
+				settings->setRuntimeDisplayModeAll();
 			}
 			else {
-				settings->setPrimary(TRUE);
-				settings->setSecondary(FALSE);
+				settings->setRuntimeDisplayModePrimary();
 			}
 			continue;
 		}
@@ -395,9 +392,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 			char* endPtr = NULL;
 			long port = strtol(&cmdline[i], &endPtr, 10);
 			if (endPtr != &cmdline[i] && port > 0 && port <= 65535) {
-				settings->setAutoPortSelect(FALSE);
-				settings->setPortNumber(port);
-				settings->setHttpPortNumber(DISPLAY_TO_HPORT(PORT_TO_DISPLAY(port)));
+				settings->setRuntimePortOverride(port);
 			}
 			if (endPtr != NULL && endPtr > &cmdline[i]) {
 				i = static_cast<size_t>(endPtr - cmdline);
@@ -409,7 +404,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 			strncmp(&cmdline[i], winvncEnableNotification, notificationLen) == 0 &&
 			isArgBoundary(cmdline[i + notificationLen]))
 		{
-			settings->setNotification(TRUE);
+			settings->setRuntimeEnableNotification();
 			i += notificationLen;
 			continue;
 		}
@@ -418,7 +413,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 			strncmp(&cmdline[i], winvncHideTrayIcon, hideTrayLen) == 0 &&
 			isArgBoundary(cmdline[i + hideTrayLen]))
 		{
-			settings->setDisableTrayIcon(TRUE);
+			settings->setRuntimeHideTrayIcon();
 			i += hideTrayLen;
 			continue;
 		}
