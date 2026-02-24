@@ -118,7 +118,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			strcpy_s(accept_reject_mesg, settings->getAccept_reject_mesg());
 
 			if (strlen(accept_reject_mesg) == 0) 
-				strcpy_s(accept_reject_mesg,"UltraVNC Server has received an incoming connection from");
+				strcpy_s(accept_reject_mesg,"OpView has received an incoming connection from");
 
 			if (strlen(_this->infoMsg) > 0) {
 				strcat_s(accept_reject_mesg, "\r\n");

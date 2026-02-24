@@ -287,7 +287,7 @@ namespace ScSelect {
 				if (((LPNMHDR)lParam)->code == NM_CLICK) {
 					iSelect = SendMessageW(hList, LVM_GETNEXTITEM, -1, LVNI_FOCUSED);
 					if (iSelect == -1) {
-						helper::yesUVNCMessageBox(hInstResDLL, hWnd, "No VNC Server selected", "Error", MB_ICONINFORMATION);
+						helper::yesUVNCMessageBox(hInstResDLL, hWnd, "No OpView server selected", "Error", MB_ICONINFORMATION);
 						break;
 					}
 					char temp1[255] = { 0 };

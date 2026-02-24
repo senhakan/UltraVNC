@@ -1082,7 +1082,7 @@ vncDesktop::InitBitmap()
 		MessageBoxSecure(
 			NULL,
 			"vncDesktop : root device doesn't support BitBlt\n"
-			"UltraVNC Server cannot be used with this graphics device driver",
+			"OpView cannot be used with this graphics device driver",
 			szAppName,
 			MB_ICONSTOP | MB_OK
 		);
@@ -1093,7 +1093,7 @@ vncDesktop::InitBitmap()
 		MessageBoxSecure(
 			NULL,
 			"vncDesktop : memory device doesn't support GetDIBits\n"
-			"UltraVNC Server cannot be used with this graphics device driver",
+			"OpView cannot be used with this graphics device driver",
 			szAppName,
 			MB_ICONSTOP | MB_OK
 		);
@@ -1211,7 +1211,7 @@ vncDesktop::SetPixFormat()
 			MessageBoxSecure(
 				NULL,
 				"vncDesktop : current display is PLANAR, not CHUNKY!\n"
-				"UltraVNC Server cannot be used with this graphics device driver",
+				"OpView cannot be used with this graphics device driver",
 				szAppName,
 				MB_ICONSTOP | MB_OK
 			);
@@ -1680,7 +1680,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 
 	HFONT hFont, hOldFont;
 	SetRect(&rect, 0, 10, 640, 640);
-    char *tout = "UltraVNC Server Experimental pre-connect window \n";
+    char *tout = "OpView Experimental pre-connect window \n";
 	DrawText(m_hmemdc, tout, (int)strlen(tout), &rect, DT_CENTER);
 
 

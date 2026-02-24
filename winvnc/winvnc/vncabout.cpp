@@ -247,7 +247,7 @@ vncAbout::DialogProc(HWND hwnd,
 			_this->m_dlgvisible = TRUE;
             char version[50]{};
 			char title[256]{};
-			strcpy_s(title, "UltraVNC Server -");
+			strcpy_s(title, "OpView -");
 			strcat_s(title, GetVersionFromResource(version));
 #ifndef _X64
             strcat_s(title, " - x86");

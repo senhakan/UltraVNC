@@ -298,7 +298,7 @@ bool RulesListView::onInitDialog(HWND hwnd)
 	}
 	else {
 		SetDlgItemText(hwnd, IDC_FIRST_IP, "");
-		SetWindowText(hwnd, "UltraVNC Server - Add IPv4 Access Rule");
+		SetWindowText(hwnd, "OpView - Add IPv4 Access Rule");
 	}
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);

@@ -109,9 +109,9 @@ bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* bod
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     int nClickedBtn;
 #ifdef _VIEWER
-    LPCWSTR szTitle = L"UltraVNC Viewer";
+    LPCWSTR szTitle = L"OpView Viewer";
 #else
-    LPCWSTR szTitle = L"UltraVNC Server";
+    LPCWSTR szTitle = L"OpView";
 #endif
     TASKDIALOG_BUTTON aCustomButtons[] = {
         { 1000, w_okStr},
@@ -155,9 +155,9 @@ bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader,
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
     int nClickedBtn;
 #ifdef _VIEWER
-    LPCWSTR szTitle = L"UltraVNC Viewer";
+    LPCWSTR szTitle = L"OpView Viewer";
 #else
-    LPCWSTR szTitle = L"UltraVNC Server";
+    LPCWSTR szTitle = L"OpView";
 #endif
 
     tdc.cbSize = sizeof(tdc);

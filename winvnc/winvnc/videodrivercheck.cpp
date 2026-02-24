@@ -55,7 +55,7 @@ BOOL GetDllProductVersion(char* dllName, char *vBuffer, int size)
    DWORD sVersion = GetFileVersionInfoSize(dllName, &rBuffer);
    if (sVersion==0)
 	   {
-		   strcpy_s(vBuffer, 512, "Fail: Using 32-bit UltraVNC Server winvnc.exe with a 64-bit driver? \n");		   
+		   strcpy_s(vBuffer, 512, "Fail: Using 32-bit OpView winvnc.exe with a 64-bit driver? \n");		   
 		   return (FALSE);
 		}
 
@@ -174,7 +174,7 @@ CheckVideoDriver(bool Box)
                         else
                         {
                             strcat_s(buf2, "Driver Not Activated, is the viewer current connected?\n");
-                            strcat_s(buf2, "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin\n");
+                            strcat_s(buf2, "A Mirrior Driver can only be started if OpView is a service or running as admin\n");
                         }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}

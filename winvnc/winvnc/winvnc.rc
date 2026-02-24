@@ -44,7 +44,7 @@ IDB_EXPAND              BITMAP                  "res/down.bmp"
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
 STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "UltraVNC Server - Chat"
+CAPTION "OpView - Chat"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
@@ -58,7 +58,7 @@ END
 
 IDD_LIST_DLG DIALOGEX 0, 0, 298, 123
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - List of VNC Clients"
+CAPTION "OpView - List of OpView Clients"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "CLOSE",IDOK,118,94,62,14
@@ -73,13 +73,13 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 274, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - About"
+CAPTION "OpView - About"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
-    LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2025 UltraVNC Team Members",IDC_NAME,49,27,222,12
+    LTEXT           "OpView Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
+    LTEXT           "Copyright © 2002-2025 OpView Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
@@ -89,7 +89,7 @@ END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Initiate Connection"
+CAPTION "OpView - Initiate Connection"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
@@ -104,12 +104,12 @@ END
 IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Server - Accept connection"
+CAPTION "OpView - Accept connection"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "&ACCEPT",IDACCEPT,7,74,53,14
     DEFPUSHBUTTON   "&REJECT",IDREJECT,130,74,49,14
-    LTEXT           "UltraVNC Server has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
+    LTEXT           "OpView has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
     CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
     CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
     CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
@@ -118,7 +118,7 @@ END
 
 IDD_DIALOGCLOUD DIALOGEX 0, 0, 311, 103
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Cloud connect"
+CAPTION "OpView - Cloud connect"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "SAVE",IDOK,253,82,50,14
@@ -138,7 +138,7 @@ END
 IDC_TITLEWINDOW DIALOGEX 0, 0, 269, 206
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST | WS_EX_TRANSPARENT
-CAPTION "UltraVNC SC"
+CAPTION "OpView SC"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "List1",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,4,0,171,120
@@ -146,7 +146,7 @@ BEGIN
     LTEXT           "TEXTMIDDLE",IDC_TEXTMIDDLE,4,153,141,8
     LTEXT           "TEXTBOTTOM",IDC_TEXTBOTTOM,4,165,141,8
     PUSHBUTTON      "Info",IDC_HELPWEB,4,179,80,14,BS_FLAT
-    RTEXT           "Team UltraVNC 2022",IDC_TEXTRIGHTBOTTOM,2,195,173,8
+    RTEXT           "Team OpView 2022",IDC_TEXTRIGHTBOTTOM,2,195,173,8
     PUSHBUTTON      "Close",IDC_CLOSE,95,179,80,14,BS_FLAT
     DEFPUSHBUTTON   "Connect",IDC_CONNECT,4,123,171,14,BS_FLAT
     CONTROL         IDB_LOGO64,IDC_LOGO,"Static",SS_BITMAP,136,145,28,24
@@ -157,7 +157,7 @@ END
 
 IDD_MSLOGON DIALOGEX 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - MS-Logon Setup"
+CAPTION "OpView - MS-Logon Setup"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
@@ -318,7 +318,7 @@ BEGIN
     BEGIN
         MENUITEM "&Settings",                   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
+        MENUITEM "&About OpView...",   ID_ABOUT
         POPUP "Visit our links"
         BEGIN
             MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
@@ -344,7 +344,7 @@ BEGIN
         MENUITEM "Reboot in safe mode",         ID_REBOOTSAFEMODE
         MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
         MENUITEM SEPARATOR
-        MENUITEM "&Close VNC Connections",      ID_CLOSE
+        MENUITEM "&Close OpView Connections",      ID_CLOSE
     END
 END
 
@@ -352,9 +352,9 @@ IDR_TRAYMENU1 MENU
 BEGIN
     POPUP "tray"
     BEGIN
-        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
+        MENUITEM "&About OpView...",   ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Close VNC Connections",      ID_CLOSE
+        MENUITEM "&Close OpView Connections",      ID_CLOSE
     END
 END
 
@@ -474,7 +474,7 @@ IDI_FLASH               ICON                    "res/icon2.ico"
 
 STRINGTABLE
 BEGIN
-    IDI_WINVNC              "UltraVNC Server"
+    IDI_WINVNC              "OpView"
 END
 
 STRINGTABLE
@@ -484,80 +484,80 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_CURRENT_USER_PROP    "UltraVNC Server: Current User Properties"
-    ID_DEFAULT_SYST_PROP    "UltraVNC Server: Default Local System Properties"
-    ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC Viewer"
+    ID_CURRENT_USER_PROP    "OpView: Current User Properties"
+    ID_DEFAULT_SYST_PROP    "OpView: Default Local System Properties"
+    ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nOpView cannot be used with this graphics device driver"
+    ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nOpView cannot be used with this graphics device driver"
+    ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nOpView cannot be used with this graphics device driver"
+    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening OpView Viewer"
     ID_FAILED_INIT          "Failed to initialize the socket system"
     ID_MB1                  "MB1"
-    ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
-    ID_NO_EXIST_INST        "No existing instance of UltraVNC Server could be contacted"
+    ID_NO_CURRENT_USER_ERR  "The OpView settings for the current user are unavailable at present."
+    ID_NO_EXIST_INST        "No existing instance of OpView could be contacted"
 END
 
 STRINGTABLE
 BEGIN
     ID_WARNING              "WARNING"
-    ID_WINVNC_ERROR         "UltraVNC Server - Error"
-    ID_WINVNC_USAGE         "UltraVNC Server Usage"
-    ID_WINVNC_WARNIN        "UltraVNC Server - Warning"
-    ID_WVNC                 "WVNC"
+    ID_WINVNC_ERROR         "OpView - Error"
+    ID_WINVNC_USAGE         "OpView Usage"
+    ID_WINVNC_WARNIN        "OpView - Warning"
+    ID_WVNC                 "OPVIEW"
 END
 
 STRINGTABLE
 BEGIN
-    ID_ANOTHER_INST         "Another instance of UltraVNC Server is already running"
+    ID_ANOTHER_INST         "Another instance of OpView is already running"
     ID_AUTHAD_NOT_FO        "You selected MS-Logon, but the authad.dll\nwas not found.Check you installation"
     ID_AUTH_NOT_FO          "You selected MS-Logon, but the auth.dll\nwas not found.Check you installation"
     ID_AUTOACCEPT_U         "AutoAccept: %u"
     ID_AUTOREJECT_U         "AutoReject: %u"
     ID_CADERROR             "Ctrl-alt-del require service, no permission"
-    ID_CADERRORFILE         "The file cad.exe was not found in the same folder as UltraVNC Server winvnc.exe"
-    ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
+    ID_CADERRORFILE         "The file cad.exe was not found in the same folder as OpView winvnc.exe"
+    ID_CADPERMISSION        "Permission denied on cad.exe, OpView must be installed in ""program files"" else special cad permission is refused."
     ID_CANNOT_EDIT_DEFAULT_PREFS 
-                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
-    ID_CHAT_WITH_S_ULTRAVNC "UltraVNC Server - Chat with <%s>"
+                            "You do not have sufficient privileges to edit the default local OpView settings."
+    ID_CHAT_WITH_S_ULTRAVNC "OpView - Chat with <%s>"
 END
 
 STRINGTABLE
 BEGIN
-    ID_SERV_SUCCESS_UNREG   "The UltraVNC Server service has been unregistered"
-    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer!\nIt presumably does not support Text Chat\n"
-    ID_ULTRAVNC_WARNING     "UltraVNC Warning"
-    ID_UNABLE_INST          "Unable to install UltraVNC Server service"
+    ID_SERV_SUCCESS_UNREG   "The OpView service has been unregistered"
+    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an OpView Viewer!\nIt presumably does not support Text Chat\n"
+    ID_ULTRAVNC_WARNING     "OpView Warning"
+    ID_UNABLE_INST          "Unable to install OpView service"
     ID_UNABLE_PROC_MSLOGON  "Unable to process MS-Logon"
 END
 
 STRINGTABLE
 BEGIN
-    ID_SCM_NOT_HERE         "The SCM could not be contacted - the UltraVNC Server service was not installed"
+    ID_SCM_NOT_HERE         "The SCM could not be contacted - the OpView service was not installed"
     ID_SERVHELP_NREM        "WARNING: The ServiceHelper hook entry could not be removed from the registry"
     ID_SERVHELP_UNAB        "WARNING: Unable to install the ServiceHelper hook\nGlobal user-specific registry settings will not be loaded"
-    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the UltraVNC Server service was not registered"
-    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the UltraVNC Server service was not unregistered"
-    ID_SERV_FAIL_ST         "The UltraVNC Server service failed to start"
-    ID_SERV_MK_UNREG        "The UltraVNC Server service is already marked to be unregistered"
-    ID_SERV_NCONTACT        "The UltraVNC Server service could not be contacted"
-    ID_SERV_NOT_REG         "The UltraVNC Server service could not be registered"
-    ID_SERV_NOT_STOP        "The UltraVNC Server service could not be stopped"
-    ID_SERV_NOT_UNRG        "The UltraVNC Server service could not be unregistered"
-    ID_SERV_NT_FOUND        "The UltraVNC Server service could not be found"
-    ID_SERV_OLD_REG         "The UltraVNC Server service is already registered"
-    ID_SERV_SUCCESS_INST    "The UltraVNC Server service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is rebooted"
-    ID_SERV_SUCCESS_REG     "The UltraVNC Server service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is rebooted"
+    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the OpView service was not registered"
+    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the OpView service was not unregistered"
+    ID_SERV_FAIL_ST         "The OpView service failed to start"
+    ID_SERV_MK_UNREG        "The OpView service is already marked to be unregistered"
+    ID_SERV_NCONTACT        "The OpView service could not be contacted"
+    ID_SERV_NOT_REG         "The OpView service could not be registered"
+    ID_SERV_NOT_STOP        "The OpView service could not be stopped"
+    ID_SERV_NOT_UNRG        "The OpView service could not be unregistered"
+    ID_SERV_NT_FOUND        "The OpView service could not be found"
+    ID_SERV_OLD_REG         "The OpView service is already registered"
+    ID_SERV_SUCCESS_INST    "The OpView service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is rebooted"
+    ID_SERV_SUCCESS_REG     "The OpView service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is rebooted"
 END
 
 STRINGTABLE
 BEGIN
-    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
+    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with OpView settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
     ID_NO_PASSWD_NO_LOGON_WARN 
-                            "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
+                            "WARNING: This machine has no default password set. OpView will present the Default Properties dialog now to allow one to be entered."
     ID_NO_PASSWD_NO_OVERRIDE_ERR 
-                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
+                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure OpView properly."
     ID_NO_PASSWD_NO_OVERRIDE_WARN 
                             "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
+    ID_NO_PASSWORD_WARN     "WARNING: Running OpView without setting a password is a dangerous security risk!\nUntil you set a password, OpView will not accept incoming connections."
     ID_NO_PLUGIN_DETECT     "No Plugin detected..."
     ID_OUTGOING_CONNECTION  "Outgoing Connection"
     ID_PLUGIN_LOADIN        "Plugin Loading"
@@ -584,7 +584,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDD_PROPERTIESDIALOG DIALOGEX 0, 0, 380, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Settings"
+CAPTION "OpView - Settings"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,204,232,50,14
@@ -597,7 +597,7 @@ IDD_FORM_AUTHENTICATION DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "VNC Password",IDC_PASSWORD_LABEL,11,17,50,11,SS_CENTERIMAGE
+    LTEXT           "OpView Password",IDC_PASSWORD_LABEL,11,17,50,11,SS_CENTERIMAGE
     LTEXT           "View-Only Password",IDC_PASSWORD_LABEL2,11,38,69,11,SS_CENTERIMAGE
     CONTROL         "None portable password",IDC_SAVEPASSWORDSECURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,189,10
     GROUPBOX        "Authentication",IDC_STATIC,7,4,344,76
@@ -637,7 +637,7 @@ IDD_FORM_Log DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
+    CONTROL         "Log debug infos to the OpView.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
     CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
     PUSHBUTTON      "CLEAR AVI ENCODER",IDC_CLEAR,79,47,75,9
     LTEXT           "Path",IDC_STATIC,13,33,18,8
@@ -675,7 +675,7 @@ BEGIN
     EDITTEXT        IDC_PORTRFB,219,16,29,12,ES_AUTOHSCROLL
     LTEXT           "HTTP port",IDC_STATIC,160,31,38,8
     EDITTEXT        IDC_PORTHTTP,219,30,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
+    CONTROL         "Enable OpView JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
     CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
@@ -701,7 +701,7 @@ END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Edit IPv4 Access Rule"
+CAPTION "OpView - Edit IPv4 Access Rule"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "IPv4 Addresses",IDC_STATIC,0,5,223,58,WS_GROUP
@@ -809,7 +809,7 @@ END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Enter UltraVNC Server Administration Password"
+CAPTION "OpView - Enter OpView Administration Password"
 FONT 11, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -820,7 +820,7 @@ END
 
 IDD_CHANGE_PASSWORD DIALOGEX 0, 0, 182, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Change Password"
+CAPTION "OpView - Change Password"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "SAVE",IDOK,68,84,50,14
@@ -845,7 +845,7 @@ BEGIN
     CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
     CONTROL         "Disable clients options in Tray icon menu",IDC_ALLOWEDITCLIENTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
-    CONTROL         "Forbid the user to close down UltraVNC Server",IDC_ALLOWSHUTDOWN,
+    CONTROL         "Forbid the user to close down OpView",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
     LTEXT           "Default Server Screen Scale",IDC_STATIC,14,116,100,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL

@@ -41,14 +41,14 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "UltraVNC - Remote Control for all"
+            VALUE "Comments", "OpView - Remote Control for all"
             VALUE "CompanyName", "uvnc bv"
-            VALUE "FileDescription", "UltraVNC Server"
+            VALUE "FileDescription", "OpView"
             VALUE "FileVersion", APS_FULLVERSION_STR
             VALUE "InternalName", "WinVNC.exe"
             VALUE "LegalCopyright", "Copyright © 2002-" STRINGIZE(APS_DATEYEAR) " UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "WinVNC.exe"
-            VALUE "ProductName", "UltraVNC Server"
+            VALUE "ProductName", "OpView"
             VALUE "ProductVersion", APS_FULLVERSION_STR
         END
     END
