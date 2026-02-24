@@ -323,8 +323,92 @@ void extractConfig(char* szCmdLine)
 	char logFile[MAX_PATH];
 	strcpy(logFile, configFile);
 	replaceFilename(logFile, "mslogon.log");
-	settings->setLogFile(logFile);
-	settings->setShowSettings(showSettings);
+settings->setLogFile(logFile);
+settings->setShowSettings(showSettings);
+}
+
+static bool isArgBoundary(char c)
+{
+	return c == 0 || c <= ' ';
+}
+
+static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
+{
+	if (!cmdline) return;
+
+	const size_t n = strlen(cmdline);
+	const size_t displayModeLen = strlen(winvncDisplayMode);
+	const size_t portOverrideLen = strlen(winvncPortOverride);
+	const size_t notificationLen = strlen(winvncEnableNotification);
+	const size_t hideTrayLen = strlen(winvncHideTrayIcon);
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (cmdline[i] <= ' ')
+			continue;
+
+		if (i + displayModeLen <= n &&
+			strncmp(&cmdline[i], winvncDisplayMode, displayModeLen) == 0 &&
+			isArgBoundary(cmdline[i + displayModeLen]))
+		{
+			i += displayModeLen;
+			while (cmdline[i] <= ' ' && cmdline[i] != 0) i++;
+			size_t start = i;
+			while (cmdline[i] > ' ') i++;
+			size_t len = i - start;
+
+			if (len == 9 && strncmp(&cmdline[start], "secondary", 9) == 0) {
+				settings->setPrimary(FALSE);
+				settings->setSecondary(TRUE);
+			}
+			else if (len == 3 && strncmp(&cmdline[start], "all", 3) == 0) {
+				settings->setPrimary(TRUE);
+				settings->setSecondary(TRUE);
+			}
+			else {
+				settings->setPrimary(TRUE);
+				settings->setSecondary(FALSE);
+			}
+			continue;
+		}
+
+		if (i + portOverrideLen <= n &&
+			strncmp(&cmdline[i], winvncPortOverride, portOverrideLen) == 0 &&
+			isArgBoundary(cmdline[i + portOverrideLen]))
+		{
+			i += portOverrideLen;
+			while (cmdline[i] <= ' ' && cmdline[i] != 0) i++;
+
+			char* endPtr = NULL;
+			long port = strtol(&cmdline[i], &endPtr, 10);
+			if (endPtr != &cmdline[i] && port > 0 && port <= 65535) {
+				settings->setAutoPortSelect(FALSE);
+				settings->setPortNumber(port);
+				settings->setHttpPortNumber(DISPLAY_TO_HPORT(PORT_TO_DISPLAY(port)));
+			}
+			if (endPtr != NULL && endPtr > &cmdline[i]) {
+				i = static_cast<size_t>(endPtr - cmdline);
+			}
+			continue;
+		}
+
+		if (i + notificationLen <= n &&
+			strncmp(&cmdline[i], winvncEnableNotification, notificationLen) == 0 &&
+			isArgBoundary(cmdline[i + notificationLen]))
+		{
+			settings->setNotification(TRUE);
+			i += notificationLen;
+			continue;
+		}
+
+		if (i + hideTrayLen <= n &&
+			strncmp(&cmdline[i], winvncHideTrayIcon, hideTrayLen) == 0 &&
+			isArgBoundary(cmdline[i + hideTrayLen]))
+		{
+			settings->setDisableTrayIcon(TRUE);
+			i += hideTrayLen;
+			continue;
+		}
+	}
 }
 	
 
@@ -442,6 +526,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		{
 			szCmdLine[i] = tolower(szCmdLine[i]);
 		}
+		// Parse override switches once so option order does not matter.
+		ApplyRuntimeOverridesFromCommandLine(szCmdLine);
 		BOOL argfound = FALSE;
 		for (i = 0; i < strlen(szCmdLine); i++)
 		{
