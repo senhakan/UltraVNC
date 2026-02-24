@@ -191,10 +191,10 @@ void SettingsManager::setDefaults()
 	m_pref_Collabo = false;
 #ifndef SC_20
 	m_pref_Frame = TRUE;
-	m_pref_Notification = TRUE;
+	m_pref_Notification = FALSE;
 #else
 	m_pref_Frame = true;
-	m_pref_Notification = true;
+	m_pref_Notification = false;
 #endif // SC_20
 	m_pref_OSD = FALSE;
 	m_pref_NotificationSelection = 0;

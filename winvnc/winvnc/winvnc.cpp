@@ -837,6 +837,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				continue;
 			}
+
+			if (strncmp(&szCmdLine[i], winvncEnableNotification, strlen(winvncEnableNotification)) == 0)
+			{
+				settings->setNotification(TRUE);
+				i += strlen(winvncEnableNotification);
+				continue;
+			}
+
+			if (strncmp(&szCmdLine[i], winvncHideTrayIcon, strlen(winvncHideTrayIcon)) == 0)
+			{
+				settings->setDisableTrayIcon(TRUE);
+				i += strlen(winvncHideTrayIcon);
+				continue;
+			}
 			
 			if (strncmp(&szCmdLine[i], winvncsettings, strlen(winvncsettings)) == 0)
 			{

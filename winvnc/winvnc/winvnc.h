@@ -61,6 +61,8 @@ const char winvnchttp[]	= "-httpproxy";
 const char winvncsettings[] = "-settings";
 const char winvncDisplayMode[] = "-displaymode";
 const char winvncPortOverride[] = "-port";
+const char winvncEnableNotification[] = "-notification";
+const char winvncHideTrayIcon[] = "-hidetrayicon";
 
 //adzm 2009-06-20
 // for use with -sc
