@@ -567,9 +567,9 @@ void vncMenu::addMenus()
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
 	if (settings->RunningFromExternalService())
-		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart UltraVNC Server");
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart OpView");
 	else
-		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Shutdown UltraVNC Server");
+		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Shutdown OpView");
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_OUTGOING_CONN,
@@ -656,7 +656,7 @@ void vncMenu::setBalloonInfo()
 			: NIF_ICON | NIF_MESSAGE | NIF_STATE | NIF_TIP | NIF_INFO;
 		wcsncpy_s(m_nid.szInfo, m_BalloonInfo, 255);
 		m_nid.szInfo[255] = '\0';
-		wcscpy_s(m_nid.szInfoTitle, L"UltraVNC Connection...");
+		wcscpy_s(m_nid.szInfoTitle, L"OpView Connection...");
 		m_nid.dwInfoFlags = NIIF_INFO;
 		balloonset = true;
 	}
@@ -922,7 +922,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 
 		case ID_OUTGOING_CONN:
-			// Connect out to a listening VNC Viewer
+			// Connect out to a listening OpView Viewer
 		{
 			auto newconn = std::make_unique<vncConnDialog>(_this->m_server);
 			if (newconn)
@@ -1009,12 +1009,12 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_CLOSE: {
 			if (settings->RunningFromExternalService()) {
-				if (!MessageBoxSecure(NULL, "Do you want to restart the UltraVNC Server?", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to restart OpView?", "", MB_YESNO))
 					return 0;
 			}
 #ifndef SC_20
 			else {
-				if (!MessageBoxSecure(NULL, "Do you want to close the UltraVNC Server?", "", MB_YESNO))
+				if (!MessageBoxSecure(NULL, "Do you want to close OpView?", "", MB_YESNO))
 					return 0;
 			}
 #endif
@@ -1096,7 +1096,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_UNINSTALL_SERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to uninstall the UltraVNC service?", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to uninstall the OpView service?", "Service", MB_YESNO))
 				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
 			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
@@ -1130,7 +1130,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
 		case ID_RUNASSERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to install UltraVNC as service?", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to install OpView as service?", "Service", MB_YESNO))
 				return 0;
 			DWORD errorcode = 0;
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
@@ -1223,7 +1223,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 		break;
 		case ID_START_SERVICE:
 		{
-			if (!MessageBoxSecure(NULL, "Do you want to start the UltraVNC service?", "Service", MB_YESNO))
+			if (!MessageBoxSecure(NULL, "Do you want to start the OpView service?", "Service", MB_YESNO))
 				return 0;
 			HANDLE hProcess{}, hPToken{};
 			const DWORD id = processHelper::GetExplorerLogonPid();
