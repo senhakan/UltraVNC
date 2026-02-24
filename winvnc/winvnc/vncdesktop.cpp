@@ -1031,6 +1031,12 @@ vncDesktop::InitBitmap()
 	}
 
 	Checkmonitors();
+	const bool secondaryOnly = (!settings->getPrimary() && settings->getSecondary());
+	if (secondaryOnly && nr_monitors > 1) {
+		show_all_monitors = false;
+		m_current_monitor = 1;
+		m_old_monitor = m_current_monitor;
+	}
 	requested_all_monitor = m_buffer.IsAllMonitors();
     if (requested_all_monitor && nr_monitors > 1)
     {

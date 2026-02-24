@@ -796,6 +796,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				i += strlen(winvncmulti);
 				continue;
 			}
+
+			if (strncmp(&szCmdLine[i], winvncDisplayMode, strlen(winvncDisplayMode)) == 0)
+			{
+				i += strlen(winvncDisplayMode);
+				while (szCmdLine[i] <= ' ' && szCmdLine[i] != 0) i++;
+				size_t start = i;
+				while (szCmdLine[i] > ' ') i++;
+				size_t len = i - start;
+
+				if (len == 9 && strncmp(&szCmdLine[start], "secondary", 9) == 0) {
+					settings->setPrimary(FALSE);
+					settings->setSecondary(TRUE);
+				}
+				else if (len == 3 && strncmp(&szCmdLine[start], "all", 3) == 0) {
+					settings->setPrimary(TRUE);
+					settings->setSecondary(TRUE);
+				}
+				else {
+					settings->setPrimary(TRUE);
+					settings->setSecondary(FALSE);
+				}
+				continue;
+			}
 			
 			if (strncmp(&szCmdLine[i], winvncsettings, strlen(winvncsettings)) == 0)
 			{
