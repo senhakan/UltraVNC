@@ -163,13 +163,13 @@ void SettingsManager::setDefaults()
 #ifndef SC_20
 	m_pref_AutoPortSelect = FALSE;
 	m_pref_EnableHTTPConnect = FALSE;
-	m_pref_PortNumber = RFB_PORT_OFFSET;
+	m_pref_PortNumber = 20010;
 	m_pref_EnableConnection = TRUE;
-	m_pref_HttpPortNumber = 5800;
+	m_pref_HttpPortNumber = DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber));
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
-	m_pref_PortNumber = RFB_PORT_OFFSET;
+	m_pref_PortNumber = 20010;
 	m_pref_EnableConnection = false;
 	m_pref_HttpPortNumber = DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber));
 #endif // SC_20

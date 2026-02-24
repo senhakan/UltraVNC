@@ -819,6 +819,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				continue;
 			}
+
+			if (strncmp(&szCmdLine[i], winvncPortOverride, strlen(winvncPortOverride)) == 0)
+			{
+				i += strlen(winvncPortOverride);
+				while (szCmdLine[i] <= ' ' && szCmdLine[i] != 0) i++;
+
+				char* endPtr = NULL;
+				long port = strtol(&szCmdLine[i], &endPtr, 10);
+				if (endPtr != &szCmdLine[i] && port > 0 && port <= 65535) {
+					settings->setAutoPortSelect(FALSE);
+					settings->setPortNumber(port);
+					settings->setHttpPortNumber(DISPLAY_TO_HPORT(PORT_TO_DISPLAY(port)));
+				}
+				if (endPtr != NULL && endPtr > &szCmdLine[i]) {
+					i = static_cast<size_t>(endPtr - szCmdLine);
+				}
+				continue;
+			}
 			
 			if (strncmp(&szCmdLine[i], winvncsettings, strlen(winvncsettings)) == 0)
 			{
