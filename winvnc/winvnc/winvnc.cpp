@@ -341,6 +341,7 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 	const size_t portOverrideLen = strlen(winvncPortOverride);
 	const size_t notificationLen = strlen(winvncEnableNotification);
 	const size_t hideTrayLen = strlen(winvncHideTrayIcon);
+	const size_t connectionOverlayLen = strlen(winvncConnectionOverlay);
 	for (size_t i = 0; i < n; ++i)
 	{
 		if (cmdline[i] <= ' ')
@@ -401,6 +402,15 @@ static void ApplyRuntimeOverridesFromCommandLine(char* cmdline)
 		{
 			settings->setRuntimeHideTrayIcon();
 			i += hideTrayLen;
+			continue;
+		}
+
+		if (i + connectionOverlayLen <= n &&
+			strncmp(&cmdline[i], winvncConnectionOverlay, connectionOverlayLen) == 0 &&
+			isArgBoundary(cmdline[i + connectionOverlayLen]))
+		{
+			settings->setRuntimeConnectionOverlay();
+			i += connectionOverlayLen;
 			continue;
 		}
 	}

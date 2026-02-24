@@ -63,6 +63,7 @@ const char winvncDisplayMode[] = "-displaymode";
 const char winvncPortOverride[] = "-port";
 const char winvncEnableNotification[] = "-notification";
 const char winvncHideTrayIcon[] = "-hidetrayicon";
+const char winvncConnectionOverlay[] = "-connectionoverlay";
 
 //adzm 2009-06-20
 // for use with -sc

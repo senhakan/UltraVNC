@@ -441,7 +441,11 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
 
 void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD)
 {
-    strcpy_s(this->infoMsg, infoMsg);
+    const char* overlayText = infoMsg;
+    if (overlayText == NULL || strlen(overlayText) == 0) {
+        overlayText = "OpView session is active on this device";
+    }
+    strcpy_s(this->infoMsg, overlayText);
     this->rect = rect;
     this->set_OSD = set_OSD;
     if (enabled) {

@@ -254,6 +254,7 @@ public:
 	void setRuntimePortOverride(LONG port);
 	void setRuntimeEnableNotification();
 	void setRuntimeHideTrayIcon();
+	void setRuntimeConnectionOverlay();
 
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
@@ -295,6 +296,7 @@ private:
 	LONG m_runtimePortOverride;
 	bool m_runtimeEnableNotification;
 	bool m_runtimeHideTrayIcon;
+	bool m_runtimeConnectionOverlay;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
