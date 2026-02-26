@@ -1062,11 +1062,15 @@ vncDesktop::InitBitmap()
 		rect.bottom = rect.top + mymonitor[MULTI_MON_ALL].Height;
 	}
 	else {
-		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[MULTI_MON_PRIMARY].Width, mymonitor[MULTI_MON_PRIMARY].Height);
-		rect.left = 0;
-		rect.right = rect.left + mymonitor[MULTI_MON_PRIMARY].Width;
-		rect.top = 0;
-		rect.bottom = rect.top + mymonitor[MULTI_MON_PRIMARY].Height;
+		int selectedMonitor = m_current_monitor;
+		if (selectedMonitor == MULTI_MON_ALL || selectedMonitor < MULTI_MON_PRIMARY || selectedMonitor >= nr_monitors)
+			selectedMonitor = MULTI_MON_PRIMARY;
+
+		SetBitmapRectOffsetAndClipRect(0, 0, mymonitor[selectedMonitor].Width, mymonitor[selectedMonitor].Height);
+		rect.left = mymonitor[selectedMonitor].offsetx;
+		rect.right = rect.left + mymonitor[selectedMonitor].Width;
+		rect.top = mymonitor[selectedMonitor].offsety;
+		rect.bottom = rect.top + mymonitor[selectedMonitor].Height;
 	}
 	
 

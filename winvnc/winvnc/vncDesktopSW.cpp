@@ -66,8 +66,11 @@ vncDesktop::SetBitmapRectOffsetAndClipRect(int offesetx, int offsety, int width,
 		m_ScreenOffsety = mymonitor[MULTI_MON_ALL].offsety;
 	}
 	else {
-		m_ScreenOffsetx = mymonitor[MULTI_MON_PRIMARY].offsetx;
-		m_ScreenOffsety = mymonitor[MULTI_MON_PRIMARY].offsety;
+		int selectedMonitor = m_current_monitor;
+		if (selectedMonitor == MULTI_MON_ALL || selectedMonitor < MULTI_MON_PRIMARY || selectedMonitor >= nr_monitors)
+			selectedMonitor = MULTI_MON_PRIMARY;
+		m_ScreenOffsetx = mymonitor[selectedMonitor].offsetx;
+		m_ScreenOffsety = mymonitor[selectedMonitor].offsety;
 	}
 	m_bmrect = rfb::Rect(offesetx, offsety, width, height);
 	m_SWOffsetx = m_bmrect.tl.x;
