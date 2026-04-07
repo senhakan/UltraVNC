@@ -394,7 +394,7 @@ void SettingsManager::setRuntimeOverlayUser(const char* user)
 
 	if (strlen(m_runtimeOverlayUser) > 0) {
 		_snprintf_s(m_runtimeOverlayMessage, sizeof(m_runtimeOverlayMessage), _TRUNCATE,
-			"Uzaktan destek aktif! Bagli kullanici: %s", m_runtimeOverlayUser);
+			"Bu cihaza uzak baglanti aktif. Kullanici: %s", m_runtimeOverlayUser);
 	}
 }
 

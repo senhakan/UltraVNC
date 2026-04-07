@@ -448,7 +448,7 @@ void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg, boo
         }
     }
     if (overlayText == NULL || strlen(overlayText) == 0) {
-        overlayText = "OpView session is active on this device";
+        overlayText = "Bu cihaza uzak baglanti aktif.";
     }
     strcpy_s(this->infoMsg, overlayText);
     this->rect = rect;

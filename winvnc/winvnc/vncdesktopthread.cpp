@@ -296,7 +296,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 {
 	int inputDesktopSelected = desktopSelector::InputDesktopSelected();
 	if (inputDesktopSelected == 2) {
-		m_desktop->m_buffer.WriteMessageOnScreen("UltraVVNC running as application doesn't \nhave permission to acces \nUAC protected windows.\n\nScreen is locked until the remote user \nunlock this window");
+		m_desktop->m_buffer.WriteMessageOnScreen("OpView uzak destek icin\noturum kilit acilmasi gereklidir.\n\nOturum acilana kadar\ngoruntu alinamaz.");
 		rfb::Rect rect;
 		rect.tl = rfb::Point(0,0);
 		rect.br = rfb::Point(300,120);
