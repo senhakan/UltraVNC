@@ -1027,7 +1027,10 @@ vncDesktopThread::run_undetached(void *arg)
 									// rendering parts of the screen the mouse moved through between
 									// client updates, since in practice they will probably not have changed.
 								
-									if (cursormoved && !m_desktop->m_hookdriver && !m_desktop->m_cursorpos.is_empty()) {
+					// Always refresh the previous cursor bounds, including DDENGINE.
+					// With hardware cursor capture disabled, omitting this region can
+					// leave stale black rectangles behind the browser cursor.
+					if (cursormoved && !m_desktop->m_cursorpos.is_empty()) {
 										// Cursor position seems to be outsite the bounding
 										// When you make the screen smaller
 										// add extra check
