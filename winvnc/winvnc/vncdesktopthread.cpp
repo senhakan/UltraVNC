@@ -637,22 +637,24 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 	}
 
 	if ((settings->getPollFullScreen()) || (!m_desktop->can_be_hooked && !cursormoved)) {
-		int timeSinceLastMouseMove = lTime - m_lLastMouseMoveTime;			
-		if (timeSinceLastMouseMove > 50) { // 50 ms pause after a Mouse move 
-			++fullpollcounter;
-			rfb::Rect r = m_desktop->GetSize();
-			// THIS FUNCTION IS A PIG. It uses too much CPU on older machines (PIII, P4)
-			if (desktopSelector::InputDesktopSelected()!=2) {
-				if (m_desktop->FastDetectChanges(rgncache, r, 0, true)) 
-					capture=false;
-			}
-			else
+		// Do not pause full-screen change detection while the mouse is moving.
+		// On a dynamic desktop this made small pointer/hover updates arrive while
+		// the surrounding framebuffer stayed stale until the pointer stopped.
+		++fullpollcounter;
+		rfb::Rect r = m_desktop->GetSize();
+		// FastDetectChanges adds only detected damage; it does not send a full
+		// framebuffer on every iteration.
+		if (desktopSelector::InputDesktopSelected()!=2) {
+			if (m_desktop->FastDetectChanges(rgncache, r, 0, true))
 				capture=false;
-			// force full screen scan every three seconds after the mouse stops moving
-			if (fullpollcounter > 20) {
-				rgncache.assign_union(m_desktop->m_Cliprect);
-				fullpollcounter = 0;
-			}
+		}
+		else
+			capture=false;
+		// Periodically force a complete refresh so applications that do not
+		// publish damage rectangles cannot leave stale pixels behind.
+		if (fullpollcounter > 20) {
+			rgncache.assign_union(m_desktop->m_Cliprect);
+			fullpollcounter = 0;
 		}
 	}
 		
