@@ -872,8 +872,12 @@ vncDesktopThread::run_undetached(void *arg)
 		{
 			// DDENGINE
 			m_desktop->trigger_events[6] = m_desktop->m_screenCapture->getHScreenEvent();
-			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();			
-			waittime = 1000;
+			m_desktop->trigger_events[7] = m_desktop->m_screenCapture->getHPointerEvent();
+			// Do not leave the DDENGINE path at the legacy 1-second polling
+			// interval.  Missed/late screen events then become visible as input
+			// lag and stale rectangles in browser VNC viewers.  The event handles
+			// still wake this wait immediately; 33 ms is only the safety timeout.
+			waittime = 33;
 			DWORD dw;
 			if (XRichCursorEnabled && m_desktop->m_screenCapture && ThreadHandleCheckCursorUpdates == NULL)
 				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw);
