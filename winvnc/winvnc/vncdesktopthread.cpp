@@ -766,7 +766,11 @@ vncDesktopThread::run_undetached(void *arg)
 	// client updates are about to be triggered
 	rfb::SimpleUpdateTracker clipped_updates;
 	rfb::ClippedUpdateTracker updates(clipped_updates, m_desktop->m_Cliprect);
-	clipped_updates.enable_copyrect(true);
+	// Browser noVNC clients are more sensitive to stale source rectangles
+	// during cursor/window movement. Prefer explicit framebuffer rectangles;
+	// this avoids the black hover trails seen with CopyRect on the DDENGINE
+	// capture path. The bandwidth trade-off is acceptable for the lab pilot.
+	clipped_updates.enable_copyrect(false);
 	rfb::Region2D rgncache;
 
 
