@@ -26,7 +26,11 @@
 SERVICE_STATUS UltraVNCService::serviceStatus{};
 SERVICE_STATUS_HANDLE UltraVNCService::serviceStatusHandle = NULL;
 char UltraVNCService::service_path[MAX_PATH]{};
-char UltraVNCService::service_name[256] = "uvnc_service";
+// AppCenter installs this helper as a separate on-demand service.  Keep the
+// SCM key free of spaces so the service dispatcher and its per-service INI
+// name are deterministic; the human-readable display name is set by the
+// AppCenter installer workflow.
+char UltraVNCService::service_name[256] = "AppCenterRemoteHelper";
 char UltraVNCService::app_path[MAX_PATH]{};
 int UltraVNCService::kickrdp = 0;
 PROCESS_INFORMATION  UltraVNCService::ProcessInfo{};
