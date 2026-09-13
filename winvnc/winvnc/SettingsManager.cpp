@@ -185,7 +185,9 @@ void SettingsManager::setDefaults()
 	m_pref_QuerySetting = 2;
 	m_pref_QueryTimeout = 10;
 	m_pref_QueryDisableTime = 0;
-	m_pref_QueryAccept = 0;
+	// AppCenter performs the operator approval before the VNC endpoint is
+	// exposed. Do not show a second UltraVNC prompt on the secure desktop.
+	m_pref_QueryAccept = 2;
 	m_pref_IdleTimeout = 60;
 	m_pref_MaxViewerSetting = 0;
 	m_pref_MaxViewers = 128;
@@ -218,7 +220,9 @@ void SettingsManager::setDefaults()
 	m_pref_FTUserImpersonation = TRUE;
 	m_pref_EnableBlankMonitor = TRUE;
 	m_pref_BlankInputsOnly = FALSE;
-	m_pref_QueryIfNoLogon = 1;
+	// Keep the service capture path available for the Windows lock/sign-in
+	// desktop. A user-session prompt cannot be shown there.
+	m_pref_QueryIfNoLogon = 0;
 	m_pref_DefaultScale = 1;
 	m_pref_RequireMSLogon = false;
 	m_pref_Secure = false;
