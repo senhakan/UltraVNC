@@ -929,7 +929,6 @@ vncClientThread::FilterClients_Blacklist()
 BOOL vncClientThread::CheckEmptyPasswd()
 {
 	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
-	vnclog.Print(LL_INTINFO, VNCLOG("password check secure=%d plaintext_length=%d\\n"), settings->getSecure() ? 1 : 0, (int)strlen(plain));
 	// By default we disallow passwordless workstations!
 	if ((strlen(plain) == 0) && settings->getAuthRequired())
 	{

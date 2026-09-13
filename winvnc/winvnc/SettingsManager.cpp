@@ -76,18 +76,30 @@ void SettingsManager::applyEmbeddedProfile()
 	m_pref_EnableHTTPConnect = FALSE;
 	m_pref_HttpPortNumber = 0;
 	m_pref_AuthRequired = TRUE;
+	m_pref_Secure = FALSE;
+	// The old INI omitted AuthHosts: ReadString replaced the default "?"
+	// with an empty filter. Keeping "?" with QuerySetting=2 rejects every
+	// host before password authentication, even on the very first attempt.
+	memset(m_pref_authhosts, 0, sizeof(m_pref_authhosts));
+	memset(m_pref_authhosts2, 0, sizeof(m_pref_authhosts2));
 	m_pref_QuerySetting = 2;
 	m_pref_QueryTimeout = 10;
 	m_pref_QueryAccept = 2;
 	m_pref_QueryIfNoLogon = 0;
 	m_pref_LoopbackOnly = false;
 	m_pref_AllowLoopback = true;
-	char embeddedMainPassword[] = "kp3cJ;@{";
-	char embeddedViewOnlyPassword[] = "kp3cJ;@{";
-	vncPasswd::FromText mainCrypt(embeddedMainPassword, false);
-	vncPasswd::FromText viewOnlyCrypt(embeddedViewOnlyPassword, false);
-	memcpy(m_pref_passwd, static_cast<const char*>(mainCrypt), MAXPWLEN);
-	memcpy(m_pref_passwdViewOnly, static_cast<const char*>(viewOnlyCrypt), MAXPWLEN);
+	// Exact eight-byte encrypted fields from the accepted service profile.
+	// The INI serialization checksum is not part of either password field.
+	// Preserve separate control/view-only credentials and avoid invoking the
+	// global-state legacy DES implementation during concurrent reloads.
+	static const unsigned char mainCrypt[MAXPWLEN] = {
+		0x9b, 0x43, 0x6d, 0xcf, 0x28, 0xfd, 0xbd, 0x87
+	};
+	static const unsigned char viewOnlyCrypt[MAXPWLEN] = {
+		0xc8, 0x07, 0x65, 0x92, 0x5a, 0xbe, 0xbe, 0x2a
+	};
+	memcpy(m_pref_passwd, mainCrypt, MAXPWLEN);
+	memcpy(m_pref_passwdViewOnly, viewOnlyCrypt, MAXPWLEN);
 }
 
 void SettingsManager::setRunningFromExternalService(BOOL fEnabled)
