@@ -287,8 +287,10 @@ private:
 	SettingsManager();
 	static SettingsManager* s_instance;
 	void setDefaults();
+	void applyEmbeddedProfile();
 	void initTemp();
 	IniFile iniFile;
+	bool m_embeddedProfile;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;

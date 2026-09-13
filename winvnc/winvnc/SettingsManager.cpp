@@ -52,6 +52,7 @@ SettingsManager* SettingsManager::getInstance()
 
 SettingsManager::SettingsManager()
 {
+	m_embeddedProfile = false;
 	sodium_init();
 	setDefaults();
 }
@@ -60,7 +61,13 @@ void SettingsManager::Initialize(char *configFile)
 {
 	iniFile.setIniFile(configFile);
 	setDefaults();
-	// Do not read machine/user configuration for the service helper.  These
+	m_embeddedProfile = true;
+	applyEmbeddedProfile();
+}
+
+void SettingsManager::applyEmbeddedProfile()
+{
+	// Do not read machine/user configuration for the service helper. These
 	// values are the minimal pilot contract and intentionally exclude unused
 	// viewer, HTTP, driver and UI preferences.
 	m_pref_EnableConnection = TRUE;
@@ -81,21 +88,6 @@ void SettingsManager::Initialize(char *configFile)
 	vncPasswd::FromText viewOnlyCrypt(embeddedViewOnlyPassword, false);
 	memcpy(m_pref_passwd, static_cast<const char*>(mainCrypt), MAXPWLEN);
 	memcpy(m_pref_passwdViewOnly, static_cast<const char*>(viewOnlyCrypt), MAXPWLEN);
-	vnclog.Print(LL_INTINFO, VNCLOG("embedded profile initialized secure=%d passwd_buffer=%d\\n"), m_pref_Secure ? 1 : 0, MAXPWLEN);
-	return;
-
-	/*HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
-	int iImpersonateResult = 0;
-
-	if (hPToken != NULL) {
-		if (!ImpersonateLoggedOnUser(hPToken)) {
-			iImpersonateResult = GetLastError();
-			vnclog.Print(LL_INTWARN, VNCLOG("ImpersonateLoggedOnUser failed error %i\n"), iImpersonateResult);
-		}
-	}
-
-	if (iImpersonateResult == ERROR_SUCCESS)
-		RevertToSelf();*/
 }
 
 void SettingsManager::setRunningFromExternalService(BOOL fEnabled)
@@ -306,6 +298,13 @@ void SettingsManager::setDefaults()
 
 void SettingsManager::load()
 {
+	if (m_embeddedProfile) {
+		// PropertiesDialog and CloudDialog call load() during startup. In the
+		// helper build the profile is compiled in and must not be overwritten by
+		// an absent or stale INI file.
+		applyEmbeddedProfile();
+		return;
+	}
 	m_pref_RemoveWallpaper = iniFile.ReadInt("admin", "RemoveWallpaper", m_pref_RemoveWallpaper);
 	m_pref_RemoveEffects = iniFile.ReadInt("admin", "RemoveEffects", m_pref_RemoveEffects);
 	m_pref_RemoveFontSmoothing = iniFile.ReadInt("admin", "RemoveFontSmoothing", m_pref_RemoveFontSmoothing);
