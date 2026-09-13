@@ -424,6 +424,8 @@ void SettingsManager::load()
 }
 
 void SettingsManager::savePassword() {
+	if (m_embeddedProfile)
+		return;
 	if (strlen(m_pref_passwd) == 0) {
 		iniFile.WriteString("UltraVNC", "passwd", m_pref_passwd);
 		return;
@@ -432,6 +434,8 @@ void SettingsManager::savePassword() {
 }
 
 void SettingsManager::saveViewOnlyPassword() {
+	if (m_embeddedProfile)
+		return;
 	if (strlen(m_pref_passwdViewOnly) == 0) {
 		iniFile.WriteString("UltraVNC", "passwd2", m_pref_passwdViewOnly);
 		return;
@@ -441,6 +445,8 @@ void SettingsManager::saveViewOnlyPassword() {
 
 void SettingsManager::save()
 {
+	if (m_embeddedProfile)
+		return;
 	if (!getAllowProperties())
 		return;
 
