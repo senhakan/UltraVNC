@@ -106,7 +106,7 @@ const char HTTP_FMT_INDEX[] =
 
 const char HTTP_MSG_NOSOCKCONN [] =
 "<HTML>\n"
-"  <HEAD><TITLE>UltraVNC desktop</TITLE></HEAD>\n"
+"  <HEAD><TITLE>OpView desktop</TITLE></HEAD>\n"
 "  <BODY>\n"
 "    <H1>Connections Disabled</H1>\n"
 "    The requested desktop is not configured to accept incoming connections.\n"
@@ -318,7 +318,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			}
 			else
 			{
-				strcpy_s(desktopname, "WinVNC");
+				strcpy_s(desktopname, "OpView");
 			}
 
 			// Send the java applet page
