@@ -1106,8 +1106,10 @@ BOOL UltraVNCService::LaunchProcessWin(DWORD dwSessionId, bool preconnect, bool 
 	ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
 	ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
 	StartUPInfo.wShowWindow = SW_SHOW;
-	//StartUPInfo.lpDesktop = "Winsta0\\Winlogon";
-	StartUPInfo.lpDesktop = "Winsta0\\Default";
+	// The child runs with the winlogon token. Starting it on the secure desktop
+	// lets the capture engine see the Windows lock and sign-in screens; it can
+	// subsequently follow the active input desktop after a user signs in.
+	StartUPInfo.lpDesktop = "Winsta0\\Winlogon";
 	StartUPInfo.cb = sizeof(STARTUPINFO);
 	SetTBCPrivileges();
 	createWinvncExeCall(preconnect, rdpselect);
