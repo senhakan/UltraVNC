@@ -199,7 +199,10 @@ void SettingsManager::setDefaults()
 	m_pref_QuerySetting = 2;
 	m_pref_QueryTimeout = 10;
 	m_pref_QueryDisableTime = 0;
-	m_pref_QueryAccept = 0;
+	// AppCenter completes authorization before exposing the VNC endpoint.  A
+	// second UltraVNC confirmation cannot be displayed on the Windows sign-in
+	// desktop, so accept the already-authorized session there as well.
+	m_pref_QueryAccept = 2;
 	m_pref_IdleTimeout = 60;
 	m_pref_MaxViewerSetting = 0;
 	m_pref_MaxViewers = 128;
@@ -232,7 +235,8 @@ void SettingsManager::setDefaults()
 	m_pref_FTUserImpersonation = TRUE;
 	m_pref_EnableBlankMonitor = TRUE;
 	m_pref_BlankInputsOnly = FALSE;
-	m_pref_QueryIfNoLogon = 1;
+	// Keep the service capture path active at Windows sign-in and lock screens.
+	m_pref_QueryIfNoLogon = 0;
 	m_pref_DefaultScale = 1;
 	m_pref_RequireMSLogon = false;
 	m_pref_Secure = false;
