@@ -1,0 +1,206 @@
+name: Build winvnc.exe
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: Build configuration
+        required: true
+        default: Release
+        type: choice
+        options:
+          - Release
+          - Debug
+      platform:
+        description: Target platform
+        required: true
+        default: x64
+        type: choice
+        options:
+          - x64
+          - Win32
+  push:
+    branches:
+      - main
+      - hybrid-rshelper
+    paths:
+      - 'winvnc/**'
+      - 'common/**'
+      - 'rfb/**'
+      - 'rdr/**'
+      - 'omnithread/**'
+      - 'lzo/**'
+      - 'DSMPlugin/**'
+      - 'ZipUnZip32/**'
+      - '.github/workflows/build-winvnc.yml'
+  pull_request:
+    paths:
+      - 'winvnc/**'
+      - 'common/**'
+      - 'rfb/**'
+      - 'rdr/**'
+      - 'omnithread/**'
+      - 'lzo/**'
+      - 'DSMPlugin/**'
+      - 'ZipUnZip32/**'
+      - '.github/workflows/build-winvnc.yml'
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    env:
+      BUILD_PATH: winvnc/winvnc/winvnc.vcxproj
+      VCPKG_ROOT: C:\\vcpkg
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\\vcpkg_cache
+      CONFIGURATION: ${{ inputs.configuration || 'Release' }}
+      PLATFORM: ${{ inputs.platform || 'x64' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Ensure ATL/MFC toolchain
+        shell: pwsh
+        run: |
+          $vsInstaller = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vs_installer.exe"
+          $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise"
+          & $vsInstaller modify --installPath $vsPath --add Microsoft.VisualStudio.Component.VC.ATLMFC --quiet --norestart --wait
+
+      - name: Ensure NASM
+        shell: pwsh
+        run: |
+          if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
+            choco install nasm -y --no-progress
+          }
+          $candidates = @(
+            'C:\ProgramData\chocolatey\bin\nasm.exe',
+            'C:\Program Files\NASM\nasm.exe',
+            'C:\tools\nasm\nasm.exe'
+          )
+          $nasmPath = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $nasmPath) {
+            $nasmPath = (Get-Command nasm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -ErrorAction SilentlyContinue)
+          }
+          if ($nasmPath) {
+            $env:Path = "$(Split-Path $nasmPath -Parent);$env:Path"
+            & $nasmPath -v
+          } else {
+            Write-Warning 'NASM not found after installation; continuing because winvnc build may not require it in this configuration.'
+          }
+
+      - name: Setup vcpkg
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "$env:VCPKG_ROOT\\vcpkg.exe")) {
+            git clone https://github.com/microsoft/vcpkg.git "$env:VCPKG_ROOT"
+            & "$env:VCPKG_ROOT\\bootstrap-vcpkg.bat" -disableMetrics
+          }
+          & "$env:VCPKG_ROOT\\vcpkg.exe" integrate install
+          & "$env:VCPKG_ROOT\\vcpkg.exe" version
+
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\\vcpkg_cache
+          key: ${{ runner.os }}-${{ env.PLATFORM }}-${{ env.CONFIGURATION }}-vcpkg-${{ hashFiles('winvnc/winvnc/vcpkg.json') }}
+
+      - name: Ensure vcpkg cache directory
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:VCPKG_DEFAULT_BINARY_CACHE" | Out-Null
+
+      - name: Install build dependencies (vcpkg classic mode)
+        shell: pwsh
+        run: |
+          if ($env:PLATFORM -eq 'x64') {
+            $triplet = 'x64-windows-static'
+          } else {
+            $triplet = 'x86-windows-static'
+          }
+
+          & "$env:VCPKG_ROOT\\vcpkg.exe" install `
+            "zlib:$triplet" `
+            "zstd:$triplet" `
+            "libjpeg-turbo:$triplet" `
+            "liblzma:$triplet" `
+            "libsodium:$triplet"
+
+      - name: Diagnose ATL include availability
+        shell: pwsh
+        run: |
+          $atlHeader = Get-ChildItem `
+            -Path "${env:ProgramFiles(x86)}\\Microsoft Visual Studio\\2022" `
+            -Filter atlbase.h `
+            -Recurse `
+            -ErrorAction SilentlyContinue |
+            Select-Object -First 5 -ExpandProperty FullName
+
+          if ($atlHeader) {
+            Write-Host "Found atlbase.h:"
+            $atlHeader | ForEach-Object { Write-Host "  $_" }
+          } else {
+            Write-Warning "atlbase.h was not found under VS2022 directories."
+          }
+
+      - name: Build winvnc.exe
+        shell: pwsh
+        run: |
+          $legacyOutDir = "..\\$env:PLATFORM\\$env:CONFIGURATION\\"
+          msbuild "$env:BUILD_PATH" `
+            /t:Build `
+            /m:1 `
+            /p:Configuration=$env:CONFIGURATION `
+            /p:Platform=$env:PLATFORM `
+            /p:PlatformToolset=v143 `
+            /p:UseOfAtl=Static `
+            /p:OutDir="$legacyOutDir" `
+            /p:IntDir="$legacyOutDir" `
+            /p:VcpkgEnableManifest=false `
+            /p:PostBuildEventUseInBuild=false
+
+      - name: Validate build output (smoke test)
+        shell: pwsh
+        run: |
+          $candidates = @()
+          if ($env:PLATFORM -eq 'x64') {
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\x64\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\x64\\$env:CONFIGURATION\\winvnc.exe"
+          } else {
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\$env:CONFIGURATION\\winvnc.exe"
+            $candidates += Join-Path $env:GITHUB_WORKSPACE "winvnc\\winvnc\\$env:CONFIGURATION\\winvnc.exe"
+          }
+
+          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if (-not $exe) {
+            throw "winvnc.exe not found in expected paths: $($candidates -join ', ')"
+          }
+
+          $item = Get-Item $exe
+          if ($item.Length -le 0) {
+            throw "winvnc.exe exists but file size is zero"
+          }
+
+          $ver = $item.VersionInfo.FileVersion
+          if ([string]::IsNullOrWhiteSpace($ver)) {
+            throw "winvnc.exe file version is empty"
+          }
+
+          Write-Host "winvnc.exe path: $exe"
+          Write-Host "winvnc.exe size: $($item.Length) bytes"
+          Write-Host "winvnc.exe version: $ver"
+
+      - name: Upload winvnc artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winvnc-${{ env.PLATFORM }}-${{ env.CONFIGURATION }}
+          if-no-files-found: error
+          path: |
+            winvnc/x64/${{ env.CONFIGURATION }}/winvnc.exe
+            winvnc/${{ env.CONFIGURATION }}/winvnc.exe
+            winvnc/winvnc/x64/${{ env.CONFIGURATION }}/winvnc.exe
+            winvnc/winvnc/${{ env.CONFIGURATION }}/winvnc.exe
