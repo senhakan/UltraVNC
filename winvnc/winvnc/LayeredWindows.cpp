@@ -272,13 +272,16 @@ LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wPar
     HDC hdc;
     switch (uMsg) {
     case WM_PAINT: {
-        HGDIOBJ original = NULL;
         hdc = BeginPaint(hwnd, &ps);
-        original = SelectObject(hdc, GetStockObject(DC_PEN));       
-        SelectObject(hdc, hPen);
-        SelectObject(hdc, hFont);
-
-        Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+        // Window painting uses client coordinates, not virtual-desktop offsets.
+        // The secondary monitor may be to the right, left or above the primary.
+        HGDIOBJ oldPen = SelectObject(hdc, hPen);
+        HGDIOBJ oldFont = SelectObject(hdc, hFont);
+        HGDIOBJ oldBrush = SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+        RECT clientRect;
+        GetClientRect(hwnd, &clientRect);
+        Rectangle(hdc, clientRect.left + 2, clientRect.top + 2,
+            clientRect.right - 2, clientRect.bottom - 2);
         SetTextColor(hdc, RGB(255, 0, 0));
         SetBkMode(hdc, TRANSPARENT);
         
@@ -290,8 +293,11 @@ LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wPar
             DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_LEFT);
         }
 
-        SelectObject(hdc, original);
-        DeleteObject(hPen);
+        // These objects belong to LayeredWindows and are reused on repaint.
+        // Never delete a pen while it is selected into a DC.
+        SelectObject(hdc, oldBrush);
+        SelectObject(hdc, oldFont);
+        SelectObject(hdc, oldPen);
         EndPaint(hwnd, &ps);
     }
                  break;
