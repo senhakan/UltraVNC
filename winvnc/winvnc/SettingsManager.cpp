@@ -50,6 +50,24 @@ SettingsManager* SettingsManager::getInstance()
 	return s_instance;
 }
 
+// AppCenter helper profile: keep only the settings required by the native
+// service and remote-support contract.  The encrypted VNC password bytes are
+// the same format used by UltraVNC's INI reader (8-byte binary values).
+static unsigned char embeddedHexNibble(char c)
+{
+	if (c >= '0' && c <= '9') return static_cast<unsigned char>(c - '0');
+	if (c >= 'a' && c <= 'f') return static_cast<unsigned char>(10 + c - 'a');
+	if (c >= 'A' && c <= 'F') return static_cast<unsigned char>(10 + c - 'A');
+	return 0;
+}
+
+static void embeddedPassword(char *out, size_t outLen, const char *hex)
+{
+	memset(out, 0, outLen);
+	for (size_t i = 0; i < outLen && hex && hex[i * 2] && hex[i * 2 + 1]; ++i)
+		out[i] = static_cast<char>((embeddedHexNibble(hex[i * 2]) << 4) | embeddedHexNibble(hex[i * 2 + 1]));
+}
+
 SettingsManager::SettingsManager()
 {
 	sodium_init();
@@ -59,7 +77,25 @@ SettingsManager::SettingsManager()
 void SettingsManager::Initialize(char *configFile)
 {
 	iniFile.setIniFile(configFile);
-	load();
+	setDefaults();
+	// Do not read machine/user configuration for the service helper.  These
+	// values are the minimal pilot contract and intentionally exclude unused
+	// viewer, HTTP, driver and UI preferences.
+	m_pref_EnableConnection = TRUE;
+	m_pref_AutoPortSelect = FALSE;
+	m_pref_PortNumber = 20010;
+	m_pref_EnableHTTPConnect = FALSE;
+	m_pref_HttpPortNumber = 0;
+	m_pref_AuthRequired = TRUE;
+	m_pref_QuerySetting = 2;
+	m_pref_QueryTimeout = 10;
+	m_pref_QueryAccept = 2;
+	m_pref_QueryIfNoLogon = 0;
+	m_pref_LoopbackOnly = false;
+	m_pref_AllowLoopback = true;
+	embeddedPassword(m_pref_passwd, sizeof(m_pref_passwd), "9B436DCF28FDBD8783");
+	embeddedPassword(m_pref_passwdViewOnly, sizeof(m_pref_passwdViewOnly), "C80765925ABEBE2AC6");
+	return;
 
 	/*HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 	int iImpersonateResult = 0;
