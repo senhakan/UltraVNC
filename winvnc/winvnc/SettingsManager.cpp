@@ -334,6 +334,9 @@ void SettingsManager::applyRuntimeOverrides()
 	case RUNTIME_DISPLAYMODE_SECONDARY:
 		m_pref_Primary = FALSE;
 		m_pref_Secondary = TRUE;
+		// A user-session companion captures its selected monitor via GDI.
+		// Do not share the primary service's desktop-duplication resources.
+		m_pref_ddEngine = FALSE;
 		break;
 	case RUNTIME_DISPLAYMODE_ALL:
 		m_pref_Primary = TRUE;
