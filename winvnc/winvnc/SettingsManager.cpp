@@ -81,6 +81,7 @@ void SettingsManager::Initialize(char *configFile)
 	vncPasswd::FromText viewOnlyCrypt(embeddedViewOnlyPassword, false);
 	memcpy(m_pref_passwd, static_cast<const char*>(mainCrypt), MAXPWLEN);
 	memcpy(m_pref_passwdViewOnly, static_cast<const char*>(viewOnlyCrypt), MAXPWLEN);
+	vnclog.Print(LL_INTINFO, VNCLOG("embedded profile initialized secure=%d passwd_buffer=%d\\n"), m_pref_Secure ? 1 : 0, MAXPWLEN);
 	return;
 
 	/*HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
