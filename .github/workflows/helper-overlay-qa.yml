@@ -1,0 +1,45 @@
+name: Helper overlay native QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [service-customization-pilot]
+    paths:
+      - winvnc/winvnc/HelperOverlayPolicy.h
+      - tests/helper-overlay-*.cpp
+      - tests/run-helper-overlay-system-tests.ps1
+      - .github/workflows/helper-overlay-qa.yml
+
+permissions:
+  contents: read
+
+jobs:
+  native-qa:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile standalone native tests
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          if errorlevel 1 exit /b 1
+          mkdir overlay-qa
+          cl /nologo /std:c++14 /EHsc /utf-8 /W4 /WX /MT tests\helper-overlay-policy-test.cpp /Fe:overlay-qa\helper-overlay-policy-test.exe /Fo:overlay-qa\portable.obj
+          if errorlevel 1 exit /b 1
+          cl /nologo /std:c++14 /EHsc /utf-8 /W4 /WX /MT tests\helper-overlay-windows-qa.cpp /Fe:overlay-qa\helper-overlay-windows-qa.exe /Fo:overlay-qa\native.obj
+          if errorlevel 1 exit /b 1
+          overlay-qa\helper-overlay-policy-test.exe
+          if errorlevel 1 exit /b 1
+      - name: Exercise native mapping ACL and snapshot as SYSTEM
+        shell: pwsh
+        run: ./tests/run-helper-overlay-system-tests.ps1 -Executable ./overlay-qa/helper-overlay-windows-qa.exe -Report ./overlay-qa/system-qa.jsonl
+      - name: Upload standalone QA executables and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: helper-overlay-native-qa
+          if-no-files-found: error
+          path: |
+            overlay-qa/*.exe
+            overlay-qa/*.jsonl

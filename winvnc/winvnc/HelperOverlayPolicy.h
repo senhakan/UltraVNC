@@ -107,10 +107,10 @@ inline bool TrustedMapping(HANDLE mapping) {
 
 // Called once at desktop/overlay initialization, not from a timer/frame loop.
 // Missing/invalid policy must never be interpreted as an explicit disabled flag.
-inline ReadResult Read(Snapshot& result) {
+inline ReadResult ReadNamed(const wchar_t* mappingName, Snapshot& result) {
     result = Snapshot{};
     HANDLE mapping = OpenFileMappingW(FILE_MAP_READ | READ_CONTROL, FALSE,
-        L"Global\\AppCenter.HelperOverlay.v1");
+        mappingName);
     if (!mapping)
         return GetLastError() == ERROR_FILE_NOT_FOUND ? ReadResult::Absent : ReadResult::Invalid;
     if (!TrustedMapping(mapping)) { CloseHandle(mapping); return ReadResult::Invalid; }
@@ -134,6 +134,10 @@ inline ReadResult Read(Snapshot& result) {
     const bool valid = published && Parse(copy, WireSize, now, result);
     SecureZeroMemory(copy, sizeof(copy));
     return valid ? ReadResult::Ready : ReadResult::Invalid;
+}
+
+inline ReadResult Read(Snapshot& result) {
+    return ReadNamed(L"Global\\AppCenter.HelperOverlay.v1", result);
 }
 } // namespace HelperOverlayPolicy
 #endif

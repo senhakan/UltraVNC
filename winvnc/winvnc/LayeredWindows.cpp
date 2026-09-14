@@ -39,16 +39,31 @@
 #include "vncdesktopthread.h"
 #include "vncOSVersion.h"
 #include "LayeredWindows.h"
+#include "HelperOverlayPolicy.h"
+#include <string>
 
 HWND LayeredWindows::hwnd;
 HINSTANCE LayeredWindows::hInst;
 int LayeredWindows::wd;
 int LayeredWindows::ht;
-RECT LayeredWindows::rect;
-HFONT LayeredWindows::hFont;
-HPEN LayeredWindows::hPen;
-char LayeredWindows::infoMsg[255] = { 0 };
-bool LayeredWindows::set_OSD = false;
+
+// Owned by one helper instance; only the UI thread accesses HWND/GDI objects.
+// A shared lifetime lets teardown return safely even if the UI thread stalls.
+struct LayeredWindows::BorderState {
+    RECT bounds = {};
+    std::wstring text;
+    HANDLE stop = NULL;
+    HANDLE thread = NULL;
+    HWND window = NULL;
+    HFONT font = NULL;
+    HPEN pen = NULL;
+    ~BorderState() {
+        if (font) DeleteObject(font);
+        if (pen) DeleteObject(pen);
+        if (thread) CloseHandle(thread);
+        if (stop) CloseHandle(stop);
+    }
+};
 
 LayeredWindows::LayeredWindows()
 {
@@ -56,16 +71,10 @@ LayeredWindows::LayeredWindows()
    ht = 0;
    hwnd = NULL;
    hInst = NULL;
-   HDC hDC = GetDC(NULL);
-   nHeight = MulDiv(-18, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-   ReleaseDC(NULL, hDC);
-   hPen = CreatePen(PS_DASHDOTDOT, 5, RGB(255, 0, 0));
-   hFont = CreateFont(nHeight, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY, DEFAULT_PITCH, "Verdana");   
 }
 LayeredWindows::~LayeredWindows()
 {
-    DeleteObject(hFont);
-    DeleteObject(hPen);
+    StopBorderWindow();
 }
 
 HBITMAP LayeredWindows::DoGetBkGndBitmap2(IN CONST UINT uBmpResId)
@@ -268,36 +277,44 @@ DWORD WINAPI LayeredWindows::BlackWindow(LPVOID lpParam)
 
 LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc;
+    if (uMsg == WM_NCCREATE) {
+        const auto create = reinterpret_cast<CREATESTRUCTW*>(lParam);
+        SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(create->lpCreateParams));
+    }
+    auto state = reinterpret_cast<BorderState*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+    if (!state) return DefWindowProcW(hwnd, uMsg, wParam, lParam);
     switch (uMsg) {
     case WM_PAINT: {
-        hdc = BeginPaint(hwnd, &ps);
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hwnd, &ps);
+        const int saved = SaveDC(hdc);
+        if (!saved) { EndPaint(hwnd, &ps); return 0; }
         // Window painting uses client coordinates, not virtual-desktop offsets.
         // The secondary monitor may be to the right, left or above the primary.
-        HGDIOBJ oldPen = SelectObject(hdc, hPen);
-        HGDIOBJ oldFont = SelectObject(hdc, hFont);
-        HGDIOBJ oldBrush = SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
+        SelectObject(hdc, state->pen);
+        SelectObject(hdc, state->font);
+        SelectObject(hdc, GetStockObject(HOLLOW_BRUSH));
         RECT clientRect;
         GetClientRect(hwnd, &clientRect);
+        FillRect(hdc, &clientRect, static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH)));
         Rectangle(hdc, clientRect.left + 2, clientRect.top + 2,
             clientRect.right - 2, clientRect.bottom - 2);
         SetTextColor(hdc, RGB(255, 0, 0));
         SetBkMode(hdc, TRANSPARENT);
         
-        if (set_OSD) {
+        if (!state->text.empty()) {
             RECT rc;
             GetClientRect(hwnd, &rc);
             rc.left += 10;
+            rc.right -= 10;
             rc.top += 10;
-            DrawText(hdc, infoMsg, strlen(infoMsg), &rc, DT_LEFT);
+            DrawTextW(hdc, state->text.c_str(), static_cast<int>(state->text.size()), &rc,
+                DT_CENTER | DT_TOP | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
         }
 
         // These objects belong to LayeredWindows and are reused on repaint.
         // Never delete a pen while it is selected into a DC.
-        SelectObject(hdc, oldBrush);
-        SelectObject(hdc, oldFont);
-        SelectObject(hdc, oldPen);
+        if (saved) RestoreDC(hdc, saved);
         EndPaint(hwnd, &ps);
     }
                  break;
@@ -305,40 +322,42 @@ LRESULT CALLBACK LayeredWindows::WndBorderProc(HWND hwnd, UINT uMsg, WPARAM wPar
         DestroyWindow(hwnd);
         break;
     case WM_DESTROY:
-        PostQuitMessage(0);
+        state->window = NULL;
+        SetEvent(state->stop);
         break;
+    case WM_NCDESTROY:
+        SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
+        return DefWindowProcW(hwnd, uMsg, wParam, lParam);
     default:
-        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+        return DefWindowProcW(hwnd, uMsg, wParam, lParam);
     }
     return 0;
 }
 
 DWORD WINAPI LayeredWindows::BorderWindow(LPVOID lpParam)
 {
-    Sleep(1000);
-    HDESK desktop;
-    desktop = OpenInputDesktop(0, FALSE,
-        DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW |
-        DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL |
-        DESKTOP_WRITEOBJECTS | DESKTOP_READOBJECTS |
-        DESKTOP_SWITCHDESKTOP | GENERIC_WRITE
-    );
-
+    auto holder = static_cast<std::shared_ptr<BorderState>*>(lpParam);
+    auto state = *holder;
+    delete holder;
+    if (WaitForSingleObject(state->stop, 0) == WAIT_OBJECT_0) return 0;
+    HDESK desktop = OpenInputDesktop(0, FALSE,
+        DESKTOP_CREATEWINDOW | DESKTOP_ENUMERATE | DESKTOP_WRITEOBJECTS |
+        DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP);
     HDESK old_desktop = GetThreadDesktop(GetCurrentThreadId());
-    DWORD dummy{};
-
-    char new_name[256]{};
-    if (desktop) {
-        GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy);
-        SetThreadDesktop(desktop);
+    if (!desktop || !SetThreadDesktop(desktop)) {
+        if (desktop) CloseDesktop(desktop);
+        return 0;
     }
-
-    create_border_window(rect);
-    MSG msg;
-    while (GetMessage(&msg, 0, 0, 0) != 0)
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    if (WaitForSingleObject(state->stop, 0) != WAIT_OBJECT_0 && create_border_window(*state)) {
+        while (MsgWaitForMultipleObjects(1, &state->stop, FALSE, INFINITE, QS_ALLINPUT) == WAIT_OBJECT_0 + 1) {
+            MSG msg;
+            while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+                if (msg.message == WM_QUIT) { SetEvent(state->stop); break; }
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+        }
+        if (state->window) DestroyWindow(state->window);
     }
     SetThreadDesktop(old_desktop);
     if (desktop) CloseDesktop(desktop);
@@ -346,58 +365,42 @@ DWORD WINAPI LayeredWindows::BorderWindow(LPVOID lpParam)
     return 0;
 }
 
-bool LayeredWindows::create_border_window(RECT rect)
-{    
-    WNDCLASSEX wndClass;
+bool LayeredWindows::create_border_window(BorderState& state)
+{
+    WNDCLASSEXW wndClass;
     ZeroMemory(&wndClass, sizeof(wndClass));
     wndClass.cbSize = sizeof(wndClass);
     wndClass.style = CS_HREDRAW | CS_VREDRAW;
     wndClass.lpfnWndProc = WndBorderProc;
     wndClass.cbClsExtra = 0;
     wndClass.cbWndExtra = 0;
-    wndClass.hInstance = hInst;
+    wndClass.hInstance = GetModuleHandle(NULL);
     wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wndClass.hIconSm = NULL;
     wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndClass.hbrBackground = CreateSolidBrush(RGB(255, 255, 255));
+    wndClass.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
     wndClass.lpszMenuName = NULL;
-    wndClass.lpszClassName = "borderscreen";
-
-    RegisterClassEx(&wndClass);
-    hwnd = CreateWindowEx(WS_EX_TOOLWINDOW, "borderscreen", "borderscreen",
-        WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-        CW_USEDEFAULT, CW_USEDEFAULT, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInst, NULL);
-    typedef DWORD(WINAPI* PSLWA)(HWND, DWORD, BYTE, DWORD);
-
-    PSLWA pSetLayeredWindowAttributes = NULL;
-    HMODULE hDLL = LoadLibrary("user32");
-    if (hDLL) pSetLayeredWindowAttributes = (PSLWA)GetProcAddress(hDLL, "SetLayeredWindowAttributes");
-
-#ifndef _X64
-    LONG style = GetWindowLong(hwnd, GWL_STYLE);
-    style = GetWindowLong(hwnd, GWL_STYLE);
-    style &= ~(WS_DLGFRAME | WS_THICKFRAME);
-    SetWindowLong(hwnd, GWL_STYLE, style);
-#else
-    LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
-    style = GetWindowLongPtr(hwnd, GWL_STYLE);
-    style &= ~(WS_DLGFRAME | WS_THICKFRAME);
-    SetWindowLongPtr(hwnd, GWL_STYLE, style);
-#endif
-
-    if (pSetLayeredWindowAttributes != NULL) {
-#ifndef _X64
-        SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
-#else
-        SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST);
-#endif
-        ShowWindow(hwnd, SW_SHOWNORMAL);
-    }
-    if (pSetLayeredWindowAttributes != NULL)
-        pSetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 0, LWA_COLORKEY);
-    SetWindowPos(hwnd, HWND_TOPMOST, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
+    wndClass.lpszClassName = L"borderscreen";
+    if (!RegisterClassExW(&wndClass) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) return false;
+    HDC dc = GetDC(NULL);
+    if (!dc) return false;
+    const int height = MulDiv(-18, GetDeviceCaps(dc, LOGPIXELSY), 72);
+    ReleaseDC(NULL, dc);
+    state.pen = CreatePen(PS_DASHDOTDOT, 5, RGB(255, 0, 0));
+    state.font = CreateFontW(height, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+        DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+        NONANTIALIASED_QUALITY, DEFAULT_PITCH, L"Verdana");
+    if (!state.pen || !state.font) return false;
+    const auto& rect = state.bounds;
+    state.window = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT |
+        WS_EX_TOPMOST | WS_EX_NOACTIVATE, L"borderscreen", state.text.c_str(),
+        WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, rect.left, rect.top,
+        rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, wndClass.hInstance, &state);
+    if (!state.window) return false;
+    SetLayeredWindowAttributes(state.window, RGB(255, 255, 255), 0, LWA_COLORKEY);
     if (VNC_OSVersion::getInstance()->OS_WIN10_TRANS)
-        SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+        SetWindowDisplayAffinity(state.window, WDA_EXCLUDEFROMCAPTURE);
+    ShowWindow(state.window, SW_SHOWNOACTIVATE);
     return true;
 }
 
@@ -434,20 +437,37 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
 
 void LayeredWindows::SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD)
 {
-    strcpy_s(this->infoMsg, infoMsg);
-    this->rect = rect;
-    this->set_OSD = set_OSD;
-    if (enabled) {
-        HANDLE ThreadHandle2 = NULL;
-        DWORD dwTId;
-        ThreadHandle2 = CreateThread(NULL, 0, BorderWindow, NULL, 0, &dwTId);
-        if (ThreadHandle2)
-            CloseHandle(ThreadHandle2);
+    StopBorderWindow();
+    if (!enabled) return;
+    (void)infoMsg;
+    (void)set_OSD;
+    HelperOverlayPolicy::Snapshot policy;
+    const auto result = HelperOverlayPolicy::Read(policy);
+    if (result == HelperOverlayPolicy::ReadResult::Ready && !policy.enabled) return;
+    auto state = std::make_shared<BorderState>();
+    state->bounds = rect;
+    // Missing/invalid/expired metadata never hides the local indicator or
+    // reuses an earlier operator name. It does not affect authentication.
+    state->text = L"Uzaktan destek oturumu aktif";
+    if (result == HelperOverlayPolicy::ReadResult::Ready && policy.operatorName[0]) {
+        state->text += L" - ";
+        static_assert(sizeof(wchar_t) == sizeof(policy.operatorName[0]), "Windows UTF-16 required");
+        state->text += reinterpret_cast<const wchar_t*>(policy.operatorName);
     }
-    else {
-        HWND Blackhnd = FindWindow(("borderscreen"), 0);
-        if (Blackhnd)
-            PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-    }
+    state->stop = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (!state->stop) return;
+    auto holder = new std::shared_ptr<BorderState>(state);
+    state->thread = CreateThread(NULL, 0, BorderWindow, holder, 0, NULL);
+    if (!state->thread) { delete holder; return; }
+    borderState = state;
+}
+
+void LayeredWindows::StopBorderWindow()
+{
+    auto state = std::move(borderState);
+    if (!state) return;
+    SetEvent(state->stop);
+    // Thread owns its state until it exits; no dangling window/context on timeout.
+    WaitForSingleObject(state->thread, 5000);
 }
 
